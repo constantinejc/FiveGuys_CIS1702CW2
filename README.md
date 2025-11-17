@@ -11,7 +11,7 @@ The project will require you to combine your individual coding skills and manage
 - **LIBRARIES**: Python Standard Library only. <u>No third-party libraries.</u>
 
 ## CHOSEN PROJECT - 3. TEXT-BASED ADVENTURE GAME ENGINE
-- **Project Goal:**
+- **Project Goal**
 >  Create a reusable "engine" for a text-based adventure game. Instead of hard-coding the story, the engine should load the game's map, rooms, and interactions from a structured data file (e.g., game_map.json).
 
 - **Key Functional Requirements:**
