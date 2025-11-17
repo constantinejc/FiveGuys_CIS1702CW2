@@ -39,5 +39,3 @@ The project will require you to combine your individual coding skills and manage
   - Effective use of complex data structures (nested dictionaries/lists)
   - Robust input parser
   - Logical state management
-
-test thing
