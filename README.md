@@ -1,6 +1,6 @@
 # CW Requirements & Specifications
 ## THE TASK
-[...] you will **<u>design, develop, test, and document</u>** a complete
+[...] you will **<ins>design, develop, test, and document</ins>** a complete
 Python application [...]. 
 The project will require you to combine your individual coding skills and manage your work collaboratively using a __shared GitHub repository__. 
 
@@ -8,7 +8,7 @@ The project will require you to combine your individual coding skills and manage
 
 ## TECHNICAL SPECIFICATIONS
 - **LANGUAGE**: Python 3.8 or newer
-- **LIBRARIES**: Python Standard Library only. <u>No third-party libraries.</u>
+- **LIBRARIES**: Python Standard Library only. <ins>No third-party libraries.</ins>
 
 ## CHOSEN PROJECT - 3. TEXT-BASED ADVENTURE GAME ENGINE
 - **Project Goal**
