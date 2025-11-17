@@ -17,10 +17,10 @@ The project will require you to combine your individual coding skills and manage
 - **Key Functional Requirements:**
   - On startup, the program must load the entire game world from a JSON file.
     - This file will define:
-      - Rooms
-      - Descriptions
-      - Items
-      - Connections between rooms (e.g., "north" from the "Hall" leads to the "Kitchen")
+      - Rooms `branch:RoomObjects`
+      - Descriptions `Part of each object, no need for separate object`
+      - Items `branch:ItemObjects`
+      - Connections between rooms (e.g., "north" from the "Hall" leads to the "Kitchen") `branch:MapObjects`
   - The player must be able to navigate between rooms using commands like `go north`, `go east`, etc.
   - The player must have an inventory and be able to get item and drop item.
   - The program must parse user input to understand commands and arguments (e.g., verb: `go`, noun: `north`).
