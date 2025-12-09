@@ -9,8 +9,8 @@ class BaseCharacter:
     def __init__(self, characterJson): 
         """Character object, this can be extended for players, enemies and NPCs. 
         All data is loaded from a JSON dict and provides core stats, combat and 
-        inventory handling as well as save functionality"""
-        self.type = characterJson.get("Type", "")
+        inventory handling as well as save functionality""" 
+        self.type = characterJson.get("Type", "")   # Is this specifiying between enemy, player and NPC? (im also just kinda testing pushing lol)
         self.name = characterJson.get("Name","")
         self.description = characterJson.get("Description","")
         self.maxHealth = characterJson.get("MaxHealth", int)
