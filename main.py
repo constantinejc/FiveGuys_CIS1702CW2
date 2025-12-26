@@ -17,7 +17,7 @@ class playerCmdParser: # the parser will read through the list of actions and ma
         words = line.lower().split() # grabs player input string (line), converts it to lowercase & splits for every space
         actions = words[0] # words[0] grabs the first word in the split e.g. "go[0] up[1] later[2] now[3]" etc. and assigns it as the action
 
-        for actions in self.actions:
-            if actions in playerCmd.actions:
-                return lambda: actions.handler(words[1:]) # run the function with the matching handler
+        for action in self.actions:
+            if action in playerCmd.actions:
+                return lambda: action.handler(words[1:]) # run the function with the matching handler
         return None # placeholder for no valid handler being found by the parser
