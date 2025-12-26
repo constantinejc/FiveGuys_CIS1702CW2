@@ -1,6 +1,37 @@
 class gameEngine: # primary class that will import the objects for the game
     def __init__(self, title: str = "Five Guys Game Engine"):
+        self.title = title
+        self.parser = playerCmdParser(self)
+        self.loadActions("actions.json")
+    
+    def loadActions(self, path):
+        with open(path, "r") as f:
+            data = json.load(f)
+        for cmd in data.values():
+            handler = getattr(self, cmd["handler"])
+            self.parser.addActions(cmd["verbs"], handler)
+
+    def handlerMovement(self, args):
         pass
+
+    def handlerObservation(self, args):
+        pass
+
+    def handlerInteraction(self, args):
+        pass
+
+    def handlerInventoryView(self, args):
+        pass
+
+    def handlerInventoryEquip(self, args):
+        pass
+
+    def handlerSave(self, args):
+        pass
+
+    def handlerQuit(self, args):
+        pass
+
 class playerCmd: # class that will handle player input
     def __init__(self, actions, handler):
         self.actions = actions # pulls a list of valid synonyms for all actions
@@ -23,4 +54,3 @@ class playerCmdParser: # the parser will read through the list of actions and ma
             if userVerb in cmd.actions:
                 return lambda: cmd.handler(words[1:]) # run the function with the matching handler
         return help() # if no valid command is found based on player's input, show the help menu
-
