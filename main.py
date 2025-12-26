@@ -15,9 +15,12 @@ class playerCmdParser: # the parser will read through the list of actions and ma
 
     def parse(self, line):
         words = line.lower().split() # grabs player input string (line), converts it to lowercase & splits for every space
-        actions = words[0] # words[0] grabs the first word in the split e.g. "go[0] up[1] later[2] now[3]" etc. and assigns it as the action
+        if not words: # handles the case where the player just presses enter without typing anything; returns the help menu
+            return help()
+        userVerb = words[0] # words[0] grabs the first word in the split e.g. "go[0] up[1] later[2] now[3]" etc. and assigns it as the action
 
-        for action in self.actions:
-            if action in playerCmd.actions:
-                return lambda: action.handler(words[1:]) # run the function with the matching handler
-        return None # placeholder for no valid handler being found by the parser
+        for cmd in self.actions:
+            if userVerb in cmd.actions:
+                return lambda: cmd.handler(words[1:]) # run the function with the matching handler
+        return help() # if no valid command is found based on player's input, show the help menu
+
