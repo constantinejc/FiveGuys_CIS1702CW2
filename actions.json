@@ -1,0 +1,30 @@
+{
+  "movement": {
+    "verbs": ["go", "move", "walk", "run", "mv", "m"],
+    "handler": "handlerMovement"
+  },
+  "observation": {
+    "verbs": ["look", "examine", "inspect", "view", "v"],
+    "handler": "handlerObservation"
+  },
+  "interaction": {
+    "verbs": ["grab", "pickup", "obtain", "g"],
+    "handler": "handlerInteraction"
+  },
+  "inventoryview": {
+    "verbs": ["inventory", "backpack", "whatsonme", "i"],
+    "handler": "handlerInventoryView"
+  },
+  "inventoryequip": {
+    "verbs": ["equip", "select", "pullout", "e"],
+    "handler": "handlerInventoryEquip"
+  },  
+  "save": {
+    "verbs": ["save", "savegame", "s"],
+    "handler": "handlerSave"
+  },
+  "quit": {
+    "verbs": ["quit", "exit", "q"],
+    "handler": "handlerQuit"
+  }
+}
