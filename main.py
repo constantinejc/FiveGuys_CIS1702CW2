@@ -1,7 +1,76 @@
-# main py file, contains the game
+class gameEngine: # primary class that will import the objects for the game
+    def __init__(self, title: str = "Five Guys Game Engine"):
+        self.title = title
+        self.parser = playerCmdParser(self)
+        self.loadActions("actions.json")
+        self.currentRoom = None #Ive added this just so that there is an attribute for the
+        #current room that the user is in. 
+    
+    def loadActions(self, path):
+        with open(path, "r") as f:
+            data = json.load(f)
+        for cmd in data.values():
+            handler = getattr(self, cmd["handler"])
+            self.parser.addActions(cmd["verbs"], handler)
 
-# [SECTION] Main Menu / Settings? Difficulty? tbd
+    def handlerMovement(self, args):
+        #The lines below prevent the user from just typing "go" raher than saying like "go north"
+        #It does this my just checking if the argument list is empty.
+        if not args:
+            print("Where do you want to go?")
+            return
+        
+        #This is a definition of where the user actually wants to go, so it takes the first word after 
+        #the "go" for example which gives the direction, so the player could input "head north" or "walk north"
+        #and it makes sure that the progrma only takes in the actual direction as that the only thing it needs.
+        direction = args [0].lower()
 
-# [SECTION] Chapter 1
+        #The code below checks to see whether the direction that the user has typed in, actually has a valid exit 
+        #In that way. If it does then it updates where the player currently is by using the atribute in the game engine 
+        #class "self.currentRoom".
+        if direction in self.currentRoom.exits:
+            self.currentRoom = self.currentRoom.exits[direction]
+            print(f"You moved to the {self.currentRoom[direction]}")
+        else:
+            print("You cant go that way.")
 
-# [SECTION] 
+    def handlerObservation(self, args):
+        pass
+
+    def handlerInteraction(self, args):
+        pass
+
+    def handlerInventoryView(self, args):
+        pass
+
+    def handlerInventoryEquip(self, args):
+        pass
+
+    def handlerSave(self, args):
+        pass
+
+    def handlerQuit(self, args):
+        pass
+
+class playerCmd: # class that will handle player input
+    def __init__(self, actions, handler):
+        self.actions = actions # pulls a list of valid synonyms for all actions
+        self.handler = handler # a handler is the executable instruction (actual result the player expects by writing an action)
+class playerCmdParser: # the parser will read through the list of actions and match them to a handler, accounting for synonyms
+    def __init__(self, engine):
+        self.engine = engine # still gotta figure out why i would do this but some guy online doing the same thing did this, if i dont figure it out im deleting this :'D
+        self.actions = [] # empty list of valid actions, to be populated by the following functions
+
+    def add_actions(self, actions, handler):
+        self.actions.append(playerCmd(actions, handler))
+
+    def parse(self, line):
+        words = line.lower().split() # grabs player input string (line), converts it to lowercase & splits for every space
+        if not words: # handles the case where the player just presses enter without typing anything; returns the help menu
+            return help()
+        userVerb = words[0] # words[0] grabs the first word in the split e.g. "go[0] up[1] later[2] now[3]" etc. and assigns it as the action
+
+        for cmd in self.actions:
+            if userVerb in cmd.actions:
+                return lambda: cmd.handler(words[1:]) # run the function with the matching handler
+        return help() # if no valid command is found based on player's input, show the help menu
