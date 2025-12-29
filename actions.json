@@ -19,6 +19,10 @@
     "verbs": ["equip", "select", "pullout", "e"],
     "handler": "handlerInventoryEquip"
   },  
+  "help": {
+    "verbs": ["help", "h", "?"],
+    "handler": "handlerHelp"
+  },
   "save": {
     "verbs": ["save", "savegame", "s"],
     "handler": "handlerSave"
