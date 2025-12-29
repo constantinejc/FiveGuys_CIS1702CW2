@@ -34,12 +34,15 @@ class gameEngine: # primary class that will import the objects for the game
         print("Available Actions:")
         print("-" * 50)
         # pulls actions and handler names from json and lists
-        for cmd in self.parser.actions:
-            verbs = ", ".join(cmd.actions)
-            handler_name = cmd.handler.__name__.replace("handler", "") # removes "handler" from handle names
-            print(f"  [{handler_name}]")
-            print(f"    {verbs}")
-            print()
+        if not self.parser.actions:
+            print("No actions loaded. Check actions.json.")
+        else:
+            for cmd in self.parser.actions:
+                verbs = ", ".join(cmd.actions)
+                handlerName = cmd.handler.__name__.replace("handler", "") # removes "handler" from handle names
+                print(f"  [{handlerName}]")
+                print(f"    {verbs}")
+                print()
         print("-" * 50)
         # can add tips or any other info here
         print("\nType any one of these actions to interact with this game.")
