@@ -27,16 +27,24 @@ class gameEngine: # primary class that will import the objects for the game
         pass
     
     def handlerHelp(self, args):
+        # formatting and menu layout
         print("\n" + "="*50)
         print(f"  {self.title} - Help")
         print("="*50 + "\n")
         print("Available Actions:")
         print("-" * 50)
+        # pulls actions and handler names from json and lists
         for cmd in self.parser.actions:
             verbs = ", ".join(cmd.actions)
-            print(f"  {verbs}")
+            handler_name = cmd.handler.__name__.replace("handler", "") # removes "handler" from handle names
+            print(f"  [{handler_name}]")
+            print(f"    {verbs}")
+            print()
         print("-" * 50)
+        # can add tips or any other info here
         print("\nType any one of these actions to interact with this game.")
+        print("\nUsage: <action> [arguments]")
+        
 
     def handlerSave(self, args):
         pass
