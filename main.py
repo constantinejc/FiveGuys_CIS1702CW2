@@ -25,6 +25,18 @@ class gameEngine: # primary class that will import the objects for the game
 
     def handlerInventoryEquip(self, args):
         pass
+    
+    def handlerHelp(self, args):
+        print("\n" + "="*50)
+        print(f"  {self.title} - Help")
+        print("="*50 + "\n")
+        print("Available Actions:")
+        print("-" * 50)
+        for cmd in self.parser.actions:
+            verbs = ", ".join(cmd.actions)
+            print(f"  {verbs}")
+        print("-" * 50)
+        print("\nType any one of these actions to interact with this game.")
 
     def handlerSave(self, args):
         pass
