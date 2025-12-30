@@ -11,8 +11,13 @@ class BaseRoom:
         #can add the placements of the exits in the json file with a dictionary.
 
 
+        #The below code plays around with the idea that if the player enters a certain room then they can either win the game, or die. This means that the win room could 
+        #be the outside, if the gmae is an escsape room game and a death room could be a pitfall that the user didnt look for before entering.
+        self.inWinRoom = False
+        self.inDeathRoom = False
+
     def addExit(self, direction, roomObject):
         #This function would link the room that the player is current in, to another room in a specific direction.
         self.exits[direction] = roomObject
 
-        
+    
