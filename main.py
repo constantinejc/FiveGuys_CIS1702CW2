@@ -25,6 +25,29 @@ class gameEngine: # primary class that will import the objects for the game
 
     def handlerInventoryEquip(self, args):
         pass
+    
+    def handlerHelp(self, args):
+        # formatting and menu layout
+        print("\n" + "="*50)
+        print(f"  {self.title} - Help")
+        print("="*50 + "\n")
+        print("Available Actions:")
+        print("-" * 50)
+        # pulls actions and handler names from json and lists
+        if not self.parser.actions:
+            print("No actions loaded. Check actions.json.")
+        else:
+            for cmd in self.parser.actions:
+                verbs = ", ".join(cmd.actions)
+                handlerName = cmd.handler.__name__.replace("handler", "") # removes "handler" from handle names
+                print(f"  [{handlerName}]")
+                print(f"    {verbs}")
+                print()
+        print("-" * 50)
+        # can add tips or any other info here
+        print("\nType any one of these actions to interact with this game.")
+        print("\nUsage: <action> [arguments]")
+        
 
     def handlerSave(self, args):
         pass
