@@ -1,12 +1,12 @@
 ### Start of NPCobject
 
-from characterObjects import BaseObject as base
+from characterObjects.BaseObject import BaseCharacter as base
 
 class NPC(base):
     def __init__(self, npcJson):
         """NPC object extends the baseObject for a character, it
         contains some extras that the baseObject doesn't have."""
-        super().__init__(self, npcJson)
+        super().__init__(npcJson)
         self.dialogue = npcJson.get("Dialogue")
         self.maxOption = len(self.dialogue)
         self.currentOption = 0

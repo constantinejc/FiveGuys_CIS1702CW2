@@ -46,14 +46,6 @@
 {
     ... SuperConstructor,
     "Level": Int Value for level
+    
 }
 ```
----
-### Items
-
-
----
-### Rooms
-
-
----

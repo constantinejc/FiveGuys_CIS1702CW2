@@ -5,30 +5,52 @@ import os
 import json
 
 class BaseCharacter:
+    """BaseCharacter class is the parent class for all character objects in the game.
+    It contains the basic attributes and methods that all characters will have."""
     ### Contructor
     def __init__(self, characterJson): 
-        """Character object, this can be extended for players, enemies and NPCs. 
-        All data is loaded from a JSON dict and provides core stats, combat and 
-        inventory handling as well as save functionality"""
-        self.type = characterJson.get("Type", "")
-        self.name = characterJson.get("Name","")
-        self.description = characterJson.get("Description","")
-        self.maxHealth = characterJson.get("MaxHealth", int)
-        self.currentHealth = characterJson.get("CurrentHealth", int)
+        """
+        Docstring for __init__
+        
+        :param self: Description
+        :param characterJson: Description
+        """
+        self.type = characterJson.get("Type", "Default Type")
+        self.name = characterJson.get("Name", "Default Name")
+        self.description = characterJson.get("Description","Default Description")
+        self.maxHealth = characterJson.get("MaxHealth", 100)
+        self.currentHealth = characterJson.get("CurrentHealth", self.maxHealth)
         self.alive = self.checkAlive()
-        self.inventory = characterJson.get("Inventory", "")
-        self.equipped = self.inventory.get("Equipped","")
-        self.location = characterJson.get("Location", "")
-        self.stats = characterJson.get("Stats","")
+        self.inventory = characterJson.get("Inventory", {
+                                                "Equipped": {
+                                                    "MainHand": {},
+                                                    "OffHand": {},
+                                                    "Armour": {}
+                                                },
+                                                "BackPack": []
+                                        })
+        self.equipped = self.inventory["Equipped"]
+        self.location = characterJson.get("Location", "Starting Area")
+        self.stats = characterJson.get("Stats", {
+                                        "StrengthModifier": 5,
+                                        "AttackModifier": 5,
+                                        "Defense": 5
+                                    })
         self.saveFile = f"{self.name}"
+
+        if self.type not in ("NPC", "Player", "Enemy"):
+            self.type = "NPC"
     
     ### Methods
     def checkAlive(self): 
-        """Returns true if the character's health is above 0"""
         return (self.currentHealth > 0)
 
     def save(self):
-        """Saves this object in the designated area under the correct filepath"""
+        """
+        Docstring for save
+        
+        :param self: Description
+        """
         try:
             time = dt.datetime.now().strftime("%Y-%m-%d-%H%M")
             saveData = { 
@@ -45,62 +67,86 @@ class BaseCharacter:
             os.makedirs(folder_path, exist_ok=True)
 
             with open (f"{folder_path}/{self.saveFile}.save", "w") as file:
-                json.dump(saveData, file)
+                json.dump(saveData, file, indent=4)
                 return
             
         except Exception as e:
             print(str(e))
 
     def checkDefense(self):
-        armour = self.equipped.get("Armour")
-        defense = armour.get("Defense")
+        """
+        Docstring for checkDefense
+        
+        :param self: This is the object its self
+        """
+        armour = self.equipped.get("Armour",{}) or {}
+        defense = armour.get("Defense", self.stats.get("Defense", 0))
         if defense != self.stats.get("Defense"):
             self.stats["Defense"] = defense
 
-    def damage(self, value): 
-        """Function for taking damage and checking if the character is still alive."""
-        self.currentHealth -= value
+    def damage(self, value):
+        """
+        Docstring for damage
+        
+        :param self: This is the object its self
+        :param value: How much damage is being delt to self
+        """
+        self.currentHealth = max(self.currentHealth - value, 0)
         self.alive = self.checkAlive() 
-        if not self.alive: 
-            self.currentHealth = 0
+        if not self.alive:
+            print(f"{self.name} has died.")
+            return True
+        return False
+    
+    def heal(self, value):
+        """
+        Docstring for heal
+        
+        :param self:  This is the object its self
+        :param value: How much Health is being added to self capped at maxHealth
+        """
+        self.currentHealth = min(self.currentHealth + value, self.maxHealth)
         return
 
     def tryToHit(self, attack, damage):
-        """Check the opponent's attack against characters defense and take damage if they hit."""
+        """
+        Docstring for tryToHit
+        
+        :param self: This is the object its self
+        :param attack: This is the value for attacking hit
+        :param damage: The ammount of damage to be delt 
+        """
         self.checkDefense()
-        defense = self.stats.get("Defense")
+        defense = self.stats.get("Defense", 0)
         if attack > defense:
-            self.damage(damage)
-            return print(f"Hit landed. {damage} damage dealt. {self.currentHealth} health left.")
-        return print ("Hit missed.")
-
+            dead = self.damage(damage)
+            print(f"Hit landed. {damage} damage dealt. {self.currentHealth} health left.")
+            if dead:
+                return True
+        else:   
+            print ("Hit missed.")
+            return False
 
     def attack(self, target):
-        """Send attack and damage to the target's tryToHit function (use their fist if no weapon is in the hand)"""
+        """
+        Docstring for attack
+        
+        :param self: This is the object its self
+        :param target: This is the target object its self
+        """
         try:
-            attack = self.stats.get("AttackModifier")
+            attackValue = self.stats.get("AttackModifier")
 
             if "MainHand" not in self.equipped:
                 return print("No main hand present in equipped")
         
             item = self.equipped["MainHand"]
-            if item == None:
+            if not item:
                 damage = self.stats.get("StrengthModifier")
             else:
-                damage = item.get("Damage")
-            target.tryToHit(attack, damage)
-        
+                damage = item.get("Damage", 0) + self.stats.get("StrengthModifier", 0)
+            return target.tryToHit(attackValue, damage)
+            
         except Exception as e:
             print(f"ERROR: {str(e)}")
-
-### TEST AREA
-with open("characterObjects/TestCharacters.json", "r") as f:
-    chars = json.load(f)
-    mortJson = chars.get("Main")
-    deathJson = chars.get("Enemy")
-    Mort = BaseCharacter(mortJson)
-    Death = BaseCharacter(deathJson)
-    print(f"{Mort.alive}")
-    Mort.attack(Death)
-    Death.attack(Mort)
-    print(f"{Mort.alive}")
+            return False
