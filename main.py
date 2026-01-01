@@ -3,8 +3,6 @@ class gameEngine: # primary class that will import the objects for the game
         self.title = title
         self.parser = playerCmdParser(self)
         self.loadActions("actions.json")
-        self.currentRoom = None #Ive added this just so that there is an attribute for the
-        #current room that the user is in. 
     
     def loadActions(self, path):
         with open(path, "r") as f:
@@ -14,25 +12,7 @@ class gameEngine: # primary class that will import the objects for the game
             self.parser.addActions(cmd["verbs"], handler)
 
     def handlerMovement(self, args):
-        #The lines below prevent the user from just typing "go" raher than saying like "go north"
-        #It does this my just checking if the argument list is empty.
-        if not args:
-            print("Where do you want to go?")
-            return
-        
-        #This is a definition of where the user actually wants to go, so it takes the first word after 
-        #the "go" for example which gives the direction, so the player could input "head north" or "walk north"
-        #and it makes sure that the progrma only takes in the actual direction as that the only thing it needs.
-        direction = args [0].lower()
-
-        #The code below checks to see whether the direction that the user has typed in, actually has a valid exit 
-        #In that way. If it does then it updates where the player currently is by using the atribute in the game engine 
-        #class "self.currentRoom".
-        if direction in self.currentRoom.exits:
-            self.currentRoom = self.currentRoom.exits[direction]
-            print(f"You moved to the {self.currentRoom[direction]}")
-        else:
-            print("You cant go that way.")
+        pass
 
     def handlerObservation(self, args):
         pass
@@ -45,6 +25,29 @@ class gameEngine: # primary class that will import the objects for the game
 
     def handlerInventoryEquip(self, args):
         pass
+    
+    def handlerHelp(self, args):
+        # formatting and menu layout
+        print("\n" + "="*50)
+        print(f"  {self.title} - Help")
+        print("="*50 + "\n")
+        print("Available Actions:")
+        print("-" * 50)
+        # pulls actions and handler names from json and lists
+        if not self.parser.actions:
+            print("No actions loaded. Check actions.json.")
+        else:
+            for cmd in self.parser.actions:
+                verbs = ", ".join(cmd.actions)
+                handlerName = cmd.handler.__name__.replace("handler", "") # removes "handler" from handle names
+                print(f"  [{handlerName}]")
+                print(f"    {verbs}")
+                print()
+        print("-" * 50)
+        # can add tips or any other info here
+        print("\nType any one of these actions to interact with this game.")
+        print("\nUsage: <action> [arguments]")
+        
 
     def handlerSave(self, args):
         pass
