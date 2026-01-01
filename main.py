@@ -12,6 +12,23 @@ class gameEngine: # primary class that will import the objects for the game
             self.parser.addActions(cmd["verbs"], handler)
 
     def handlerMovement(self, args):
+        #This checks whether the player has entered a valid direction into the program and if they havent, it just reprompts them so they can enter another command.
+        if not args:
+            print("Where do you want to go?")
+            return 
+        
+        direction = args[0].lower() #This gets the word that is after the first word, which for exmaple if the command said
+        #"Go North" then the variable is going to store the lowercase version of the second word which is "north".
+        #This if statement checks if the room that the player is currently in has an exit in that direction.
+        if direction in self.currentRoom.exits:
+            #This line then changes the room that the player is currently in, to the one that they are moving to.
+            self.currentRoom = self.currentRoom.exits[direction]
+            #The following lines arejust feedback to the player, depending on whether the direction they have entered
+            #is valid or not.
+            print(f"You moved to the {self.currentRoom.name}")
+        else:
+            print("You cant go in that direction.")
+
         pass
 
     def handlerObservation(self, args):
