@@ -1,0 +1,57 @@
+{
+    "starting_room": "hall",
+
+    "rooms": {
+        "hallway": {
+            "name": "Hallway",
+            "description": "You're standing in a hallway.",
+            "exits": {
+                "north": "kitchen",
+                "east": "office",
+                "south": "outside",
+                "west": "bedroom"
+            }
+        },
+
+        "kitchen": {
+            "name": "Kitchen",
+            "description": "A kitchen with a foul odor. . . dirty dishes.",
+            "exits": {
+                "south": "hallway"
+            }
+        },
+        
+        "office": {
+            "name": "Office",
+            "description": "An office only lit by candle flame.",
+            "exits": {
+                "west": "hallway"
+            }
+        },
+
+        "outside": {
+            "name": "Outside",
+            "description": "Moonlight shines through the windows of the door. You try the handle. However, the door is locked. You hear feint whispers.",
+            "exits": {
+                "north": "hallway"
+            }
+        },
+
+        "bedroom": {
+        "name": "Bedroom",
+            "description": "A bedroom.",
+            "exits": {
+                "east": "hallway",
+                "north": "bathroom"
+            }
+        },
+
+        "bathroon": {
+            "name": "Bathroom",
+            "description": "A spotlessly clean bathroom.",
+            "exits": {
+                "west": "bedroom"
+            }
+        }
+    }
+}
