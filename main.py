@@ -3,6 +3,8 @@ class gameEngine: # primary class that will import the objects for the game
         self.title = title
         self.parser = playerCmdParser(self)
         self.loadActions("actions.json")
+        self.currentRoom = None #I readded this because I think there was some issues with one of my commits and it didnt work so jsut ot be safe
+        #ive readded this attribute.
     
     def loadActions(self, path):
         with open(path, "r") as f:
@@ -29,10 +31,26 @@ class gameEngine: # primary class that will import the objects for the game
         else:
             print("You cant go in that direction.")
 
-        pass
-
     def handlerObservation(self, args):
-        pass
+        #This is just the reassignment of the varaible that stores the room that the user is currently in so its easier to 
+        #type when coding.
+        room = self.currentRoom
+        #These two lines just output the name of the room and its description to the player.
+        print(f"\n {room.name}")
+        print(room.description)
+        #This following if statement checks whether there are exits in the room, if there are exits then it outputs their directions
+        #to the player, and if there is not then it tells the player that they cantsee any exits.
+        if room.exits:
+            print("\nExits in the room:")
+            for direction in room.exits:
+                print({direction})
+        else:
+            print("There are no visibal exits")
+        #The following if statement outputs the items that can be see in the room to the player if there is any.
+        if room.items:
+            print("\n You see the following objects scattered around the room:")
+            for item in room.items:
+                print({item.name})
 
     def handlerInteraction(self, args):
         pass
