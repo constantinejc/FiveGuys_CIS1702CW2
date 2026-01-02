@@ -55,7 +55,8 @@ class gameEngine: # primary class that will import the objects for the game
         pass
 
     def handlerQuit(self, args):
-        pass
+        print("Saving game...") #printed message to confirm that the game is saving
+        self.running = False #stops the game from running
 
 class playerCmd: # class that will handle player input
     def __init__(self, actions, handler):
