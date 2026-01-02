@@ -5,6 +5,8 @@ class gameEngine: # primary class that will import the objects for the game
         self.title = title
         self.parser = playerCmdParser(self)
         self.loadActions("actions.json")
+        self.currentRoom = None #I readded this because I think there was some issues with one of my commits and it didnt work so jsut ot be safe
+        #ive readded this attribute.
     
     def loadActions(self, path):
         with open(path, "r") as f:
@@ -14,10 +16,43 @@ class gameEngine: # primary class that will import the objects for the game
             self.parser.addActions(cmd["verbs"], handler)
 
     def handlerMovement(self, args):
-        pass
+        #This checks whether the player has entered a valid direction into the program and if they havent, it just reprompts them so they can enter another command.
+        if not args:
+            print("Where do you want to go?")
+            return 
+        
+        direction = args[0].lower() #This gets the word that is after the first word, which for exmaple if the command said
+        #"Go North" then the variable is going to store the lowercase version of the second word which is "north".
+        #This if statement checks if the room that the player is currently in has an exit in that direction.
+        if direction in self.currentRoom.exits:
+            #This line then changes the room that the player is currently in, to the one that they are moving to.
+            self.currentRoom = self.currentRoom.exits[direction]
+            #The following lines arejust feedback to the player, depending on whether the direction they have entered
+            #is valid or not.
+            print(f"You moved to the {self.currentRoom.name}")
+        else:
+            print("You cant go in that direction.")
 
     def handlerObservation(self, args):
-        pass
+        #This is just the reassignment of the varaible that stores the room that the user is currently in so its easier to 
+        #type when coding.
+        room = self.currentRoom
+        #These two lines just output the name of the room and its description to the player.
+        print(f"\n {room.name}")
+        print(room.description)
+        #This following if statement checks whether there are exits in the room, if there are exits then it outputs their directions
+        #to the player, and if there is not then it tells the player that they cantsee any exits.
+        if room.exits:
+            print("\nExits in the room:")
+            for direction in room.exits:
+                print({direction})
+        else:
+            print("There are no visibal exits")
+        #The following if statement outputs the items that can be see in the room to the player if there is any.
+        if room.items:
+            print("\n You see the following objects scattered around the room:")
+            for item in room.items:
+                print({item.name})
 
     def handlerInteraction(self, args):
         pass
