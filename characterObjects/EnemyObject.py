@@ -1,5 +1,5 @@
 ### Start of  MainCharObject
-
+import random
 from characterObjects.BaseObject import BaseCharacter as base
 
 class Enemy(base):
@@ -16,7 +16,6 @@ class Enemy(base):
         
         :param self: This is the object its self
         """
-        import random
         droppedItems = []
         for item, dropChance in self.lootTable.items():
             if random.random() <= dropChance:

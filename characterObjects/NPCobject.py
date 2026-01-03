@@ -17,7 +17,7 @@ class NPC(base):
         if self.currentOption < self.maxOption:
             dialogue = self.dialogue[self.currentOption]
             self.currentOption += 1
-            return dialogue
+            return print(dialogue)
         else:
             self.currentOption = 0
             return self.dialogue[0]
