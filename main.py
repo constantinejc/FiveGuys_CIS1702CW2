@@ -108,6 +108,7 @@ class gameEngine: # primary class that will import the objects for the game
             print(f"Game saved. File saved to: {filename} ")
 
     def handlerQuit(self, args):
+        handlerSave()
         print("Saving game...") #printed message to confirm that the game is saving
         self.running = False #stops the game from running
 
