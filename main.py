@@ -1,3 +1,5 @@
+import json
+
 class gameEngine: # primary class that will import the objects for the game
     def __init__(self, title: str = "Five Guys Game Engine"):
         self.title = title
@@ -52,15 +54,7 @@ class gameEngine: # primary class that will import the objects for the game
             for item in room.items:
                 print({item.name})
 
-    def handlerInteraction(self, args):
-        pass
 
-    def handlerInventoryView(self, args):
-        pass
-
-    def handlerInventoryEquip(self, args):
-        pass
-    
     def handlerHelp(self, args):
         # formatting and menu layout
         print("\n" + "="*50)
@@ -85,10 +79,29 @@ class gameEngine: # primary class that will import the objects for the game
         
 
     def handlerSave(self, args):
-        pass
+        #filename picker
+        #if the user types a name it will take the name and attack it to the save file
+        if args:
+            filename = args[0] + ".json"
+        else:
+            #if the user does not type a name it will save with this filename as a default
+            filename = "save.json"
+        
+        
+        #defining what is to be saved
+        save_data = {
+            "current_room": self.currentRoom.id if self.currentRoom else "start",
+            "inventory": [item.name for item in self.inventory]
+        }
+
+        #writing to a file
+        with open(filename, "w") as file:
+            json.dump(save_data, file)
+            print(f"Game saved. File saved to: {filename} ")
 
     def handlerQuit(self, args):
-        pass
+        print("Saving game...") #printed message to confirm that the game is saving
+        self.running = False #stops the game from running
 
 class playerCmd: # class that will handle player input
     def __init__(self, actions, handler):
