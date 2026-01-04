@@ -53,16 +53,19 @@ class gameEngine: # primary class that will import the objects for the game
 
     def handlerSave(self, args):
         #filename picker
+        #if the user types a name it will take the name and attack it to the save file
+        if args:
+            filename = args[0] + ".json"
+        else:
+            #if the user does not type a name it will save with this filename as a default
+            filename = "save.json"
         
-        '''
-        filename = args[0] + ".json"
-        filename = base_name
-        '''
         
         #defining what is to be saved
         save_data = {
-            "current_room": #needs to be completed at a later date (depending on if the room class has an id attribute for each room which would be ideal)
-            "inventory": #needs to be completed at a a later date in order to track for which items are in the inventory, being removed from the game
+            "current_room": self.currentRoom.id if self.currentRoom else "start",
+            "inventory": [item.name for item in self.inventory]
+        }
 
         #writing to a file
         with open(filename, "w") as file:
