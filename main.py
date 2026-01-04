@@ -54,15 +54,7 @@ class gameEngine: # primary class that will import the objects for the game
             for item in room.items:
                 print({item.name})
 
-    def handlerInteraction(self, args):
-        pass
 
-    def handlerInventoryView(self, args):
-        pass
-
-    def handlerInventoryEquip(self, args):
-        pass
-    
     def handlerHelp(self, args):
         # formatting and menu layout
         print("\n" + "="*50)
