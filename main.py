@@ -1,10 +1,15 @@
 import json
 
+from roomObjects.BaseRoom import BaseRoom #This is importing in the class from the BaseRoom file so that I can reference it in 
+#the main branch
+
+
 class gameEngine: # primary class that will import the objects for the game
     def __init__(self, title: str = "Five Guys Game Engine"):
         self.title = title
         self.parser = playerCmdParser(self)
         self.loadActions("actions.json")
+        self.loadMap("gameMap.json") #I have added this function so that the user can enter the json file which has the data for the map 
         self.currentRoom = None #I readded this because I think there was some issues with one of my commits and it didnt work so jsut ot be safe
         #ive readded this attribute.
     
@@ -14,6 +19,41 @@ class gameEngine: # primary class that will import the objects for the game
         for cmd in data.values():
             handler = getattr(self, cmd["handler"])
             self.parser.addActions(cmd["verbs"], handler)
+
+#This funciton will take a seperate file which holds all of the data about the map that the user has made, and turn it into a working map.
+
+    def loadMap(self, path):
+        #This block of code is the block that takes in the json file in read mode and then assigns all the data in it as a dictionary.
+        with open(path, "r") as f:
+            worldData = json.load(f)
+            #This is the dictionary that will hold all of the roomObjects in them.
+            rooms = {}
+            #This for loop goes through each room in the json file and collects the data that the game engine needs from it.
+            for roomID in worldData["rooms"]:
+                #This just assigns the data from the room that the for loop is currently on to a variable
+                data = worldData["rooms"][roomID]
+                #This line of code now actaully passes the data through the BaseRoom class and uses the correct data, in this instance
+                #just the name and the description.
+                newRoom = BaseRoom(data["name"], data["description"])
+                #This then names the new object with its id that was taken from the json and stores it in the rooms dictionary.
+                rooms[roomID] = newRoom
+                #This block of code just assigns the player to the predefined starting room as specified in the json by the user.
+                #It also handles the error if the user has not assigned a starting room for the player character.
+                if data.get("isStart"):
+                    self.currentRoom = newRoom
+                else:
+                    print("Warning, the player character has no starting point!!")
+            #This for loop does the same thing as the last one, just going throught each room in the json file. Ive made two loops as
+            #there would be clashes otherwise as the program would try and read through exits that dont actually exist yet.
+            for roomID in worldData["rooms"]:
+                #This assigns the data from the room that the for loop is currently on to a new variable
+                data = worldData["rooms"][roomID]
+                #This for loop goes through each exit that is in the room and takes its direction and assigns it to an exit accourding to the BaseRoom class.
+                for direction in data["exits"]:
+
+                    targetID = data["exits"][direction]
+
+                    rooms[roomID].addExit(direction, rooms[targetID])
 
     def handlerMovement(self, args):
         #This checks whether the player has entered a valid direction into the program and if they havent, it just reprompts them so they can enter another command.
