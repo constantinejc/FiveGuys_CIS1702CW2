@@ -142,7 +142,7 @@ class gameEngine: # primary class that will import the objects for the game
         pass
 
     def handlerInventoryEquip(self, args):
-        pass
+        
     
     def handlerHelp(self, args):
         # formatting and menu layout
