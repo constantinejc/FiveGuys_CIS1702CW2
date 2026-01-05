@@ -19,6 +19,9 @@ class gameEngine: # primary class that will import the objects for the game
 
     def handlerMovement(self, args):
         #This checks whether the player has entered a valid direction into the program and if they havent, it just reprompts them so they can enter another command.
+        if not self.currentRoom:
+            print("No current room set. Load a world first.")
+            return
         if not args:
             print("Where do you want to go?")
             return 
@@ -38,6 +41,9 @@ class gameEngine: # primary class that will import the objects for the game
     def handlerObservation(self, args):
         #This is just the reassignment of the varaible that stores the room that the user is currently in so its easier to 
         #type when coding.
+        if not self.currentRoom:
+            print("No current room set. Load a world first.")
+            return
         room = self.currentRoom
         #These two lines just output the name of the room and its description to the player.
         print(f"\n {room.name}")
