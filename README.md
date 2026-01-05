@@ -119,8 +119,59 @@ Example structure:
 ...
 ```
 
-##JACKS CHARACTER JSONS (helpppp)
+### Characters
+- Base Character
+```
+{
+    "Type": (NPC | Enemy | Player)
+    "Name": CharacterName,
+    "Descrtiption": description of character,
+    "MaxHealth": Int value for health,
+    "CurrentHealth": Int Value for value for health,
+    "Inventory": {
+        "Equipped": {
+            "MainHand": ...ItemObject,
+            "OffHand": ...ItemObject,
+            "Armour": ...ItemObject,
+        },
+        "BackPack": [...ItemObjects]
+    },
+    "Location": RoomName,
+    "Stats", {
+        "StrengthModifier": Int value,
+        "AttackModifier": Int value,
+        "Defense": Int value
+    }
+}
+```
+- NPC Character
+```
+{
+    ... BaseCharacter,
+    "Dialog": [...Dialogues]
+}
+```
 
+- Enemy Character
+```
+{
+    ... BaseCharacter,
+    "aggressionLevel": Int value,
+    "LootTable": {
+        Itemobjects: Int value drop rate,
+        ...
+    }
+}
+```
+- Player Character
+```
+{
+    ... BaseCharacter,
+    "Experiance": Int value,
+    "Level": Int value
+}
+```
+The code does provide a default option for the creation of a base character, with int value filled in and the backpack and equiptment being set to empty.
 # SETUP
 
 Clone the repository to an empty folder, put prerequisite .json files next to `main.py` then run `main.py` in environment of choice with Python 3.8 or higher installed.
