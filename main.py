@@ -1,5 +1,5 @@
 import json
-import MainChar from MainCharObject
+from characterObjects.MainCharObject import MainChar
 import os
 
 from roomObjects.BaseRoom import BaseRoom #This is importing in the class from the BaseRoom file so that I can reference it in 
@@ -15,6 +15,14 @@ class gameEngine: # primary class that will import the objects for the game
         self.loadMap("gameMap.json") #I have added this function so that the user can enter the json file which has the data for the map 
         self.inventory = []  # check inventory exists for saving
         self.running = True
+        
+        # welcome and call observation.
+        if self.running and self.currentRoom:
+            print("\n" + "="*50)
+            print(self.title.center(50))
+            print("="*50)
+            print("\nType 'help' for a list of commands.\n")
+            self.handlerObservation([])
     
     def loadActions(self, path):
         with open(path, "r") as f:
@@ -292,13 +300,15 @@ class playerCmdParser: # the parser will read through the list of actions and ma
     def parse(self, line):
         words = line.lower().split() # grabs player input string (line), converts it to lowercase & splits for every space
         if not words: # handles the case where the player just presses enter without typing anything; returns the help menu
-            return self.engine.handlerHelp  # return help
+            return lambda: None  # do nothing on empty input
         userVerb = words[0] # words[0] grabs the first word in the split e.g. "go[0] up[1] later[2] now[3]" etc. and assigns it as the action
 
         for cmd in self.actions:
             if userVerb in cmd.actions:
                 return lambda: cmd.handler(words[1:]) # run the function with the matching handler
-        return self.engine.handlerHelp  # return help
+        
+        # If no matching action found, show an error message
+        return lambda: print(f"'{userVerb}' is not a valid action. Type 'help' to see valid actions.")
 
 if __name__ == "__main__":
     engine = gameEngine()
