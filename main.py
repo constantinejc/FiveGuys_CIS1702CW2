@@ -7,6 +7,8 @@ class gameEngine: # primary class that will import the objects for the game
         self.loadActions("actions.json")
         self.currentRoom = None #I readded this because I think there was some issues with one of my commits and it didnt work so jsut ot be safe
         #ive readded this attribute.
+        self.inventory = []  # check inventory exists for saving
+        self.running = True
     
     def loadActions(self, path):
         with open(path, "r") as f:
@@ -97,9 +99,12 @@ class gameEngine: # primary class that will import the objects for the game
         
         
         #defining what is to be saved
+        room_ref = None
+        if self.currentRoom:
+            room_ref = getattr(self.currentRoom, "id", None) or getattr(self.currentRoom, "name", None)
         save_data = {
-            "current_room": self.currentRoom.id if self.currentRoom else "start",
-            "inventory": [item.name for item in self.inventory]
+            "current_room": room_ref or "start",
+            "inventory": [getattr(item, "name", str(item)) for item in getattr(self, "inventory", [])]
         }
 
         #writing to a file
@@ -108,7 +113,7 @@ class gameEngine: # primary class that will import the objects for the game
             print(f"Game saved. File saved to: {filename} ")
 
     def handlerQuit(self, args):
-        handlerSave()
+        self.handlerSave(args)
         print("Saving game...") #printed message to confirm that the game is saving
         self.running = False #stops the game from running
 
