@@ -8,10 +8,9 @@ class gameEngine: # primary class that will import the objects for the game
     def __init__(self, title: str = "Five Guys Game Engine"):
         self.title = title
         self.parser = playerCmdParser(self)
+        self.currentRoom = None
         self.loadActions("actions.json")
         self.loadMap("gameMap.json") #I have added this function so that the user can enter the json file which has the data for the map 
-        self.currentRoom = None #I readded this because I think there was some issues with one of my commits and it didnt work so jsut ot be safe
-        #ive readded this attribute.
         self.inventory = []  # check inventory exists for saving
         self.running = True
     
@@ -26,36 +25,46 @@ class gameEngine: # primary class that will import the objects for the game
 
     def loadMap(self, path):
         #This block of code is the block that takes in the json file in read mode and then assigns all the data in it as a dictionary.
-        with open(path, "r") as f:
-            worldData = json.load(f)
-            #This is the dictionary that will hold all of the roomObjects in them.
-            rooms = {}
-            #This for loop goes through each room in the json file and collects the data that the game engine needs from it.
-            for roomID in worldData["rooms"]:
-                #This just assigns the data from the room that the for loop is currently on to a variable
-                data = worldData["rooms"][roomID]
-                #This line of code now actaully passes the data through the BaseRoom class and uses the correct data, in this instance
-                #just the name and the description.
-                newRoom = BaseRoom(data["name"], data["description"])
-                #This then names the new object with its id that was taken from the json and stores it in the rooms dictionary.
-                rooms[roomID] = newRoom
-                #This block of code just assigns the player to the predefined starting room as specified in the json by the user.
-                #It also handles the error if the user has not assigned a starting room for the player character.
-                if data.get("isStart"):
-                    self.currentRoom = newRoom
+        try:
+            with open(path, "r") as f:
+                worldData = json.load(f)
+        except FileNotFoundError:
+            print(f"Map file '{path}' not found. Load a map.")
+            return
+
+        rooms = {}
+        start_set = False
+        #This for loop goes through each room in the json file and collects the data that the game engine needs from it.
+        for roomID in worldData.get("rooms", {}):
+            data = worldData["rooms"][roomID]
+            newRoom = BaseRoom(data.get("name", roomID), data.get("description", ""))
+            rooms[roomID] = newRoom
+            #This block of code just assigns the player to the predefined starting room as specified in the json by the user.
+            #It also handles the error if the user has not assigned a starting room for the player character.
+            if data.get("isStart") and not start_set:
+                self.currentRoom = newRoom
+                start_set = True
+
+        if not rooms:
+            print("Warning, Map file has no rooms.")
+            return
+
+        if not start_set:
+            first_id = next(iter(rooms))
+            self.currentRoom = rooms[first_id]
+            print(f"Warning, the player character has no starting point!! Defaulting to '{first_id}'.")
+
+        #This for loop does the same thing as the last one, just going throught each room in the json file. Ive made two loops as
+        #there would be clashes otherwise as the program would try and read through exits that dont actually exist yet.
+        for roomID in worldData.get("rooms", {}):
+            data = worldData["rooms"][roomID]
+            for direction in data.get("exits", {}):
+                targetID = data["exits"][direction]
+                target_room = rooms.get(targetID)
+                if target_room:
+                    rooms[roomID].addExit(direction.lower(), target_room)
                 else:
-                    print("Warning, the player character has no starting point!!")
-            #This for loop does the same thing as the last one, just going throught each room in the json file. Ive made two loops as
-            #there would be clashes otherwise as the program would try and read through exits that dont actually exist yet.
-            for roomID in worldData["rooms"]:
-                #This assigns the data from the room that the for loop is currently on to a new variable
-                data = worldData["rooms"][roomID]
-                #This for loop goes through each exit that is in the room and takes its direction and assigns it to an exit accourding to the BaseRoom class.
-                for direction in data["exits"]:
-
-                    targetID = data["exits"][direction]
-
-                    rooms[roomID].addExit(direction, rooms[targetID])
+                    print(f"Warning, Exit '{direction}' from '{roomID}' targets missing room '{targetID}'.")
 
     def handlerMovement(self, args):
         #This checks whether the player has entered a valid direction into the program and if they havent, it just reprompts them so they can enter another command.
