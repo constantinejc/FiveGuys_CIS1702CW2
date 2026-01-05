@@ -39,13 +39,13 @@ class gameEngine: # primary class that will import the objects for the game
         if target_item:
             self.currentRoom.items.remove(target_item)
             # Match this to your equipItem logic
-            self.inventory["Inventory"].append(target_item) 
+            self.inventory["Backpack"].append(target_item) 
             print(f"{target_item.name} has been added to your inventory..")
             return
 
         #Searching for item in inventory and if it is within the inventory it is dropped
-        if item_name in self.inventory["Iventory"]:
-            self.inventory["Inventry"].remove(item_name)
+        if item_name in self.inventory["Backpack"]:
+            self.inventory["Backpack"].remove(item_name)
             self.currentRoom.items.append(item_name)
             print(f"You have dropped {item_name}.")
             return
@@ -55,7 +55,7 @@ class gameEngine: # primary class that will import the objects for the game
 
     def handlerInventoryView(self, args):
         print("8~~~~~~~8 Inventory 8~~~~~~~8")
-        items = self.inventory.get("Inventory", [])
+        items = self.inventory.get("Backpack", [])
         if not items:
             #if there are no items in inventory then this will run
             print("Your inventory is empty.")
