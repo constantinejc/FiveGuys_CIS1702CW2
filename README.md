@@ -77,7 +77,7 @@ Example structure:
 ...
 ```
 
-##GAMEMAP.JSON
+## GAMEMAP.JSON
 `gameMap.json` should be an unordered list of rooms with attributes which define:
   - The room's ID (e.g. `kitchen1`)
   - `name`: The room's player-facing name (e.g. `Kitchen`)
