@@ -153,3 +153,10 @@ class playerCmdParser: # the parser will read through the list of actions and ma
             if userVerb in cmd.actions:
                 return lambda: cmd.handler(words[1:]) # run the function with the matching handler
         return self.engine.handlerHelp  # return help
+
+if __name__ == "__main__":
+    engine = gameEngine()
+    while engine.running:
+        line = input("> ")
+        handler = engine.parser.parse(line)
+        handler()  # run the selected action
