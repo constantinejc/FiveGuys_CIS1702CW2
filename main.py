@@ -1,5 +1,7 @@
 import json
 
+import json
+
 from roomObjects.BaseRoom import BaseRoom #This is importing in the class from the BaseRoom file so that I can reference it in 
 #the main branch
 
@@ -138,8 +140,30 @@ class gameEngine: # primary class that will import the objects for the game
         with open(filename, "w") as file:
             json.dump(save_data, file)
             print(f"Game saved. File saved to: {filename} ")
+        #filename picker
+        #if the user types a name it will take the name and attack it to the save file
+        if args:
+            filename = args[0] + ".json"
+        else:
+            #if the user does not type a name it will save with this filename as a default
+            filename = "save.json"
+        
+        
+        #defining what is to be saved
+        save_data = {
+            "current_room": self.currentRoom.id if self.currentRoom else "start",
+            "inventory": [item.name for item in self.inventory]
+        }
+
+        #writing to a file
+        with open(filename, "w") as file:
+            json.dump(save_data, file)
+            print(f"Game saved. File saved to: {filename} ")
 
     def handlerQuit(self, args):
+        handlerSave()
+        print("Saving game...") #printed message to confirm that the game is saving
+        self.running = False #stops the game from running
         print("Saving game...") #printed message to confirm that the game is saving
         self.running = False #stops the game from running
 
@@ -165,3 +189,4 @@ class playerCmdParser: # the parser will read through the list of actions and ma
             if userVerb in cmd.actions:
                 return lambda: cmd.handler(words[1:]) # run the function with the matching handler
         return help() # if no valid command is found based on player's input, show the help menu
+
