@@ -1,4 +1,5 @@
 import json
+import MainChar from MainCharObject
 import os
 
 from roomObjects.BaseRoom import BaseRoom #This is importing in the class from the BaseRoom file so that I can reference it in 
@@ -81,6 +82,8 @@ class gameEngine: # primary class that will import the objects for the game
                 else:
                     print(f"Warning, Exit '{direction}' from '{roomID}' targets missing room '{targetID}'.")
 
+    
+
     def handlerMovement(self, args):
         #This checks whether the player has entered a valid direction into the program and if they havent, it just reprompts them so they can enter another command.
         if not self.currentRoom:
@@ -140,8 +143,43 @@ class gameEngine: # primary class that will import the objects for the game
 
     def handlerInventoryView(self, args):
         pass
+    def equipItem(self, itemName, slot):
+        """
+        Docstring for equipItem
+        
+        :param self: This is the object its self
+        :param itemName: The name of the item to be equipped
+        :param slot: The slot to equip the item to
+        """
+        if slot in self.equipped:
+            if itemName not in self.inventory["BackPack"]:
+                print(f"Item {itemName} not in backpack.")
+                return
+            else:
+                item = self.inventory["BackPack"][self.inventory["BackPack"].index(itemName)]
+                self.inventory["BackPack"].remove(itemName)
+            if self.equipped[slot]:
+                self.unequipItem(slot)
+            self.equipped[slot] = item
+            self.checkDefense()
+        else:
+            print(f"Slot {slot} does not exist in equipped items.")
+        
+    def unequipItem(self, slot):
+        """
+        Docstring for unequipItem
+        
+        :param self: This is the object its self
+        :param slot: The slot to unequip the item from
+        """
+        if slot in self.equipped:
+            item = self.equipped[slot]
+            self.inventory["BackPack"].append(item)
+            self.equipped[slot] = {}
+            self.checkDefense()
+        else:
+            print(f"Slot {slot} does not exist in equipped items.")
 
-    def handlerInventoryEquip(self, args):
         pass
     
     def handlerHelp(self, args):
