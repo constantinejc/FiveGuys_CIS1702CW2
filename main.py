@@ -53,14 +53,17 @@ class gameEngine: # primary class that will import the objects for the game
         if room.exits:
             print("\nExits in the room:")
             for direction in room.exits:
-                print({direction})
+                print(f"- {direction}")
         else:
-            print("There are no visibal exits")
+            print("There are no visible exits")
         #The following if statement outputs the items that can be see in the room to the player if there is any.
         if room.items:
-            print("\n You see the following objects scattered around the room:")
+            print("\nYou see the following objects scattered around the room:")
             for item in room.items:
-                print({item.name})
+                item_name = getattr(item, "name", str(item))
+                print(f"- {item_name}")
+        else:
+            print("\nNo items visible.")
 
     def handlerInteraction(self, args):
         pass
