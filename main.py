@@ -121,7 +121,7 @@ class playerCmdParser: # the parser will read through the list of actions and ma
         self.engine = engine # still gotta figure out why i would do this but some guy online doing the same thing did this, if i dont figure it out im deleting this :'D
         self.actions = [] # empty list of valid actions, to be populated by the following functions
 
-    def add_actions(self, actions, handler):
+    def addActions(self, actions, handler):
         self.actions.append(playerCmd(actions, handler))
 
     def parse(self, line):
