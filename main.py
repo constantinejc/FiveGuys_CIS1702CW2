@@ -37,7 +37,13 @@ class gameEngine: # primary class that will import the objects for the game
         #This for loop goes through each room in the json file and collects the data that the game engine needs from it.
         for roomID in worldData.get("rooms", {}):
             data = worldData["rooms"][roomID]
-            newRoom = BaseRoom(data.get("name", roomID), data.get("description", ""))
+            newRoom = BaseRoom(
+                data.get("name", roomID),
+                data.get("description", ""),
+                room_id=roomID,
+                isWinRoom=data.get("win", False),
+                isDeathRoom=data.get("death", False),
+            )
             rooms[roomID] = newRoom
             #This block of code just assigns the player to the predefined starting room as specified in the json by the user.
             #It also handles the error if the user has not assigned a starting room for the player character.
@@ -84,6 +90,12 @@ class gameEngine: # primary class that will import the objects for the game
             #The following lines arejust feedback to the player, depending on whether the direction they have entered
             #is valid or not.
             print(f"You moved to the {self.currentRoom.name}")
+            if self.currentRoom.isWinRRoom:
+                print("You win!")
+                self.running = False
+            if self.currentRoom.isDeathRoom:
+                print("You are dead! Womp Womp!")
+                self.running = False
         else:
             print("You cant go in that direction.")
 
