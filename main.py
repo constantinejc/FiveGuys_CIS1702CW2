@@ -183,9 +183,6 @@ class gameEngine: # primary class that will import the objects for the game
             for item in items:
                 print(f"- {item}")
 
-    def handlerInventoryEquip(self, args):
-        pass
-        pass
     def equipItem(self, itemName, slot):
         """
         Docstring for equipItem
