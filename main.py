@@ -179,8 +179,6 @@ class gameEngine: # primary class that will import the objects for the game
             self.checkDefense()
         else:
             print(f"Slot {slot} does not exist in equipped items.")
-
-        pass
     
     def handlerHelp(self, args):
         # formatting and menu layout
