@@ -139,9 +139,52 @@ class gameEngine: # primary class that will import the objects for the game
             print("\nNo items visible.")
 
     def handlerInteraction(self, args):
-        pass
+        if not args:
+            print("What do you want to do?")
+            return
+
+        #used to compare the users input with the items that match with data from the JSON file
+        item_name = " ".join(args).lower()
+        
+        #Checking if the item is within the room
+        target_item = None
+        for item in self.currentRoom.items:
+            if item.name.lower() == item_name:
+                target_item = item
+                break
+
+        #If the item is within the room then it is removed and added to the inventory
+        if target_item:
+            self.currentRoom.items.remove(target_item)
+            # Match this to your equipItem logic
+            self.inventory["Backpack"].append(target_item) 
+            print(f"{target_item.name} has been added to your inventory..")
+            return
+
+        #Searching for item in inventory and if it is within the inventory it is dropped
+        if item_name in self.inventory["Backpack"]:
+            self.inventory["Backpack"].remove(item_name)
+            self.currentRoom.items.append(item_name)
+            print(f"You have dropped {item_name}.")
+            return
+
+        #If there is not the item the user is searching for in the room then this message will pop up
+        print(f"You don't see a '{item_name}' here.")
 
     def handlerInventoryView(self, args):
+        print("8~~~~~~~8 Inventory 8~~~~~~~8")
+        items = self.inventory.get("Backpack", [])
+        if not items:
+            #if there are no items in inventory then this will run
+            print("Your inventory is empty.")
+        else:
+            #Outputs each item one by one
+            print("You have these items:")
+            for item in items:
+                print(f"- {item}")
+
+    def handlerInventoryEquip(self, args):
+        pass
         pass
     def equipItem(self, itemName, slot):
         """
