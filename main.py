@@ -1,4 +1,5 @@
 import json
+import os
 
 class gameEngine: # primary class that will import the objects for the game
     def __init__(self, title: str = "Five Guys Game Engine"):
