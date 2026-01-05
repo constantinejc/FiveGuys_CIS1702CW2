@@ -12,6 +12,8 @@ class gameEngine: # primary class that will import the objects for the game
         self.loadMap("gameMap.json") #I have added this function so that the user can enter the json file which has the data for the map 
         self.currentRoom = None #I readded this because I think there was some issues with one of my commits and it didnt work so jsut ot be safe
         #ive readded this attribute.
+        self.inventory = []  # check inventory exists for saving
+        self.running = True
     
     def loadActions(self, path):
         with open(path, "r") as f:
@@ -57,6 +59,9 @@ class gameEngine: # primary class that will import the objects for the game
 
     def handlerMovement(self, args):
         #This checks whether the player has entered a valid direction into the program and if they havent, it just reprompts them so they can enter another command.
+        if not self.currentRoom:
+            print("No current room set. Load a world first.")
+            return
         if not args:
             print("Where do you want to go?")
             return 
@@ -76,6 +81,9 @@ class gameEngine: # primary class that will import the objects for the game
     def handlerObservation(self, args):
         #This is just the reassignment of the varaible that stores the room that the user is currently in so its easier to 
         #type when coding.
+        if not self.currentRoom:
+            print("No current room set. Load a world first.")
+            return
         room = self.currentRoom
         #These two lines just output the name of the room and its description to the player.
         print(f"\n {room.name}")
@@ -85,14 +93,17 @@ class gameEngine: # primary class that will import the objects for the game
         if room.exits:
             print("\nExits in the room:")
             for direction in room.exits:
-                print({direction})
+                print(f"- {direction}")
         else:
-            print("There are no visibal exits")
+            print("There are no visible exits")
         #The following if statement outputs the items that can be see in the room to the player if there is any.
         if room.items:
-            print("\n You see the following objects scattered around the room:")
+            print("\nYou see the following objects scattered around the room:")
             for item in room.items:
-                print({item.name})
+                item_name = getattr(item, "name", str(item))
+                print(f"- {item_name}")
+        else:
+            print("\nNo items visible.")
 
     def handlerInteraction(self, args):
         pass
@@ -130,25 +141,33 @@ class gameEngine: # primary class that will import the objects for the game
         #filename picker
         #if the user types a name it will take the name and attack it to the save file
         if args:
-            filename = args[0] + ".json"
+            base = args[0]
+            filename = base if base.endswith(".json") else base + ".json"
         else:
             #if the user does not type a name it will save with this filename as a default
             filename = "save.json"
         
         
         #defining what is to be saved
+        room_ref = None
+        if self.currentRoom:
+            room_ref = getattr(self.currentRoom, "id", None) or getattr(self.currentRoom, "name", None)
+        inv = getattr(self, "inventory", []) or []
         save_data = {
-            "current_room": self.currentRoom.id if self.currentRoom else "start",
-            "inventory": [item.name for item in self.inventory]
+            "current_room": room_ref or "start",
+            "inventory": [getattr(item, "name", str(item)) for item in inv]
         }
 
-        #writing to a file
-        with open(filename, "w") as file:
-            json.dump(save_data, file)
-            print(f"Game saved. File saved to: {filename} ")
+        #writing to a file with try except error handling
+        try:
+            with open(filename, "w") as file:
+                json.dump(save_data, file)
+                print(f"Game saved. File saved to: {filename} ")
+        except OSError as e:
+            print(f"Unable to save game: {e}")
 
     def handlerQuit(self, args):
-        handlerSave()
+        self.handlerSave(args)
         print("Saving game...") #printed message to confirm that the game is saving
         self.running = False #stops the game from running
 
@@ -161,16 +180,23 @@ class playerCmdParser: # the parser will read through the list of actions and ma
         self.engine = engine # still gotta figure out why i would do this but some guy online doing the same thing did this, if i dont figure it out im deleting this :'D
         self.actions = [] # empty list of valid actions, to be populated by the following functions
 
-    def add_actions(self, actions, handler):
+    def addActions(self, actions, handler):
         self.actions.append(playerCmd(actions, handler))
 
     def parse(self, line):
         words = line.lower().split() # grabs player input string (line), converts it to lowercase & splits for every space
         if not words: # handles the case where the player just presses enter without typing anything; returns the help menu
-            return help()
+            return self.engine.handlerHelp  # return help
         userVerb = words[0] # words[0] grabs the first word in the split e.g. "go[0] up[1] later[2] now[3]" etc. and assigns it as the action
 
         for cmd in self.actions:
             if userVerb in cmd.actions:
                 return lambda: cmd.handler(words[1:]) # run the function with the matching handler
-        return help() # if no valid command is found based on player's input, show the help menu
+        return self.engine.handlerHelp  # return help
+
+if __name__ == "__main__":
+    engine = gameEngine()
+    while engine.running:
+        line = input("> ")
+        handler = engine.parser.parse(line)
+        handler()  # run the selected action
