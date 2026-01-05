@@ -6,7 +6,9 @@
             "isStart": true,
             "exits": {
                 "north": "library1"
-            }
+            },
+            "death": false,
+            "win": false
         },
 
         "library1": {
@@ -16,7 +18,9 @@
             "exits": {
                 "south": "kitchen1",
                 "east": "bedroom1"
-            }
+            },
+            "death": false,
+            "win": false
 
         },
 
@@ -26,7 +30,9 @@
             "isStart": false,
             "exits":{
                 "west": "library1"
-            }
+            },
+            "death": true,
+            "win": false
         }
     }
 }
