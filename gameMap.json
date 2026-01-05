@@ -1,0 +1,32 @@
+{
+    "rooms": {
+        "kitchen1": {
+            "name": "Kitchen",
+            "description": "The smell of warm bread lingers in the air in the smaller cozy kitchen area",
+            "isStart": true,
+            "exits": {
+                "north": "library1"
+            }
+        },
+
+        "library1": {
+            "name": "Library",
+            "description": "Dust floats in the air, cloating hundreds of old ancient looking books that cover the wall.",
+            "isStart": false,
+            "exits": {
+                "south": "kitchen1",
+                "east": "bedroom1"
+            }
+
+        },
+
+        "bedroom1": {
+            "name": "Bedroom",
+            "description": "This room has a bed, wardrobe, dresser, and desk in it.",
+            "isStart": false,
+            "exits":{
+                "west": "library1"
+            }
+        }
+    }
+}
