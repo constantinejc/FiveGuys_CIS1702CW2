@@ -58,6 +58,7 @@ The handlers are hardcoded and the full list is:
 - `handlerMovement` which when called will take the direction argument (e.g. `north`) and update the player character's location;
 - `handlerObservation` which when called will take the direction argument (e.g. `north`) OR item name argument (e.g. `lantern`) and print its description;
 - `handlerInteraction` which when called will take the item name argument (e.g. `lantern`) and add it to the player's inventory;
+- `handlerInteraction` which when called will take the item name argument and either add it to the player's inventory (grab) or drop it from the player's inventory into the room (drop);
 - `handlerInventoryView` which when called does not take arguments and prints a list of items in the player's posession
 - `handlerInventoryEquip` which when called will take the item name argument (e.g. `lantern`), check whether it is in the player's posession and then equip it in the player's hand
 - `handlerHelp` which when called does not take arguments and prints a list of all currently available actions, filtering out unavailable ones
@@ -80,6 +81,12 @@ Example structure:
     "handler": "handlerObservation",
     "description": "Look around and see room details",
     "usage": "look"
+  },
+  "interaction": {
+    "verbs": ["grab", "pickup", "obtain", "g", "drop", "d"],
+    "handler": "handlerInteraction",
+    "description": "Pick up an item from the room or drop an item from your inventory",
+    "usage": "grab <item> | drop <item>"
   },
 ...
 ```
@@ -190,6 +197,16 @@ Clone the repository to an empty folder, put prerequisite .json files next to `m
 # USAGE 
 
 Once `main.py` is run, the game should greet the player. The player can act upon the game by providing either a verb on its own, or a verb-noun combination. For a list of all available actions, the player may write `help`. Each command has guidance attached to it, so if the player is unsure about a command's usage they may write `help [command]` to view its guidance.
+
+Quick examples:
+- Move: `go north`
+- Look around: `look`
+- Pick up: `grab loaf of bread`
+- Drop: `drop loaf of bread`
+- Inventory: `inventory`
+- Save/Load: `save mygame`, `load mygame`
+
+Save files keep room item states. Items picked up or dropped are stored per-room in the save file (field `rooms_state`) and are restored when loaded.
 
 # LICENSE
 
