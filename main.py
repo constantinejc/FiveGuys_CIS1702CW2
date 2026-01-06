@@ -256,39 +256,45 @@ class gameEngine: # primary class that will import the objects for the game
             print(f"Slot {slot} does not exist in equipped items.")
 
     def handlerHelp(self, args):
-        # formatting and menu layout
+        # help menu layout
         print("\n" + "="*50)
         print(f"  {self.title} - Help")
-        print("-" * 50)
-        # pulls actions and handler names from json and lists
+        print("=" * 50)
+        # pulls actions and handler names from json and lists them
         if not self.parser.actions:
-            print("No actions loaded. Check actions.json.")
+            # if no actions are found
+            print("No actions were found... There is nothing for you to do!")
             return
 
-        # if a specific command is requested: help <command>
+        # specific command called (help <command>)
         if args:
-            query = " ".join(args).lower()
+            query = " ".join(args).lower() # can join multiple commands together
             matches = []
             try:
-                for cmd in self.parser.actions:
-                    verbs_lower = [v.lower() for v in cmd.actions]
-                    handler_raw = cmd.handler.__name__
-                    handler_name = handler_raw.replace("handler", "").replace("Inventory", "")
+                for i in self.parser.actions:
+                    verbs_lower = [v.lower() for v in i.actions] # put all verbs lowercase 
+                    handler_original = i.handler.__name__ 
+                    # clean up handler name. Had to include Inventory as Jack's equip stuff does not use our naming convention
+                    handler_name = handler_original.replace("handler", "").replace("Inventory", "") 
                     if (
                         query in verbs_lower
-                        or query == handler_raw.lower()
+                        # match both full handle name or cleaned up name
+                        or query == handler_original.lower()
                         or query == handler_name.lower()
                     ):
-                        matches.append((cmd, handler_name))
+                        matches.append((i, handler_name))
             except Exception:
-                print("Error reading the actions set. Check that the actions.json file is valid and contains all of the required fields.\n. Required fields are: verbs, handler, description, usage.")
+                # invalid or corrupted actions.json file
+                print("I can't make out what this scroll of paper says... It looks corrupted or incomplete. Ask who gave it to you to fix it!")
                 return
 
             if not matches:
-                print(f"No action matches '{query}'. Type 'help' to see all actions.")
+                # no match in actions for command to be helped with
+                print(f"What is '{query}'? I can't help you with that...\nType 'help' to see what you can do.")
                 return
 
-            print("Action Details:")
+            # show commands that match with matches variable
+            print("Here's what you can do:") 
             print("-" * 50)
             for cmd, handler_name in matches:
                 verbs = ", ".join(cmd.actions)
@@ -302,10 +308,11 @@ class gameEngine: # primary class that will import the objects for the game
             print("-" * 50)
             return
 
-        # otherwise, show the full list
-        print("Available Actions:")
+        # show full list if just 'help' called
+        print("Here's what you can do:")
         print("-" * 50)
         try:
+            # this will pull data from actions and output all handlers and data
             for cmd in self.parser.actions:
                 verbs = ", ".join(cmd.actions)
                 handlerName = cmd.handler.__name__.replace("handler", "").replace("Inventory", "")
@@ -317,12 +324,11 @@ class gameEngine: # primary class that will import the objects for the game
                     print(f"    Usage: {cmd.usage}")
                 print()
         except Exception:
-            print("Error reading the actions set. Check that the actions.json file is valid and contains all of the required fields.\n. Required fields are: verbs, handler, description, usage.")
+            # invalid or corrupted actions.json file
+            print("I can't make out what this scroll of paper says... It looks corrupted or incomplete. Ask who gave it to you to fix it!")
         print("-" * 50)
         # can add tips or any other info here
-        print("\nType any one of these actions to interact with this game.")
-        print("\nUsage: <action> [arguments]")
-        
+        print("\nType any one of these actions to interact with this game.")        
 
     def handlerSave(self, args):
         #filename picker
