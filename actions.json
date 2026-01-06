@@ -12,10 +12,10 @@
     "usage": "look"
   },
   "interaction": {
-    "verbs": ["grab", "pickup", "obtain", "g"],
+    "verbs": ["grab", "pickup", "obtain", "g", "drop", "d"],
     "handler": "handlerInteraction",
-    "description": "Pick up an item in the room",
-    "usage": "grab <item>"
+    "description": "Pick up an item from the room or drop an item from your inventory",
+    "usage": "grab <item> | drop <item>"
   },
   "inventoryview": {
     "verbs": ["inventory", "backpack", "whatsonme", "i"],
@@ -26,13 +26,13 @@
   "inventoryequip": {
     "verbs": ["equip", "select", "pullout", "e"],
     "handler": "equipItem",
-    "description": "Equip an item to a slot",
+    "description": "Equip an item to a slot. Available slots are: MainHand, OffHand, Armour.",
     "usage": "equip <item> <slot>"
   },  
   "inventoryunequip": {
     "verbs": ["unequip", "deselect", "putaway", "u"],
     "handler": "unequipItem",
-    "description": "Unequip an item from a slot",
+    "description": "Unequip an item from a slot. Available slots are: MainHand, OffHand, Armour.",
     "usage": "unequip <slot>"
   },
   "help": {
