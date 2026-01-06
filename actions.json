@@ -31,6 +31,10 @@
     "verbs": ["save", "savegame", "s"],
     "handler": "handlerSave"
   },
+  "load": {
+    "verbs": ["load", "loadgame", "l"],
+    "handler": "handlerLoad"
+  },
   "quit": {
     "verbs": ["quit", "exit", "q"],
     "handler": "handlerQuit"
