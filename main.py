@@ -186,12 +186,12 @@ class gameEngine: # primary class that will import the objects for the game
                 target_item = item
                 break
 
-        #If the item is within the room then it is removed and added to the inventory
+        #If the item is within the room then it is removed and added to the inventory (store as name string)
         if target_item:
             self.currentRoom.items.remove(target_item)
-            # Match this to your equipItem logic
-            self.inventory["Backpack"].append(target_item) 
-            print(f"{target_item.name} has been added to your inventory..")
+            item_to_add = getattr(target_item, "name", str(target_item))
+            self.inventory["Backpack"].append(item_to_add)
+            print(f"{item_to_add} has been added to your inventory.")
             return
 
         #Searching for item in inventory and if it is within the inventory it is dropped
@@ -229,11 +229,12 @@ class gameEngine: # primary class that will import the objects for the game
                 print(f"Item {itemName} not in backpack.")
                 return
             else:
-                item = self.inventory["Backpack"][self.inventory["Backpack"].index(itemName)]
+                # Items are stored as strings; remove by name
                 self.inventory["Backpack"].remove(itemName)
             if self.equipped[slot]:
                 self.unequipItem(slot)
-            self.equipped[slot] = item
+            # store equipped item as its name string
+            self.equipped[slot] = itemName
             self.checkDefense()
         else:
             print(f"Slot {slot} does not exist in equipped items.")
@@ -252,6 +253,16 @@ class gameEngine: # primary class that will import the objects for the game
             self.checkDefense()
         else:
             print(f"Slot {slot} does not exist in equipped items.")
+
+    def checkDefense(self):
+        """
+        Update defense stat based on equipped armour; tolerant of string items
+        """
+        armour = self.equipped.get("Armour", {}) or {}
+        if isinstance(armour, dict):
+            defense = armour.get("Defense", self.stats.get("Defense", 5))
+            if defense != self.stats.get("Defense"):
+                self.stats["Defense"] = defense
 
 
 
@@ -374,6 +385,9 @@ class gameEngine: # primary class that will import the objects for the game
             inv_data = save_data.get("inventory", {})
             self.inventory["Backpack"] = inv_data.get("Backpack", [])
             self.inventory["Equipped"] = inv_data.get("Equipped", {"MainHand": {}, "OffHand": {}, "Armour": {}})
+            # keep equipped alias in sync and recalc defense
+            self.equipped = self.inventory["Equipped"]
+            self.checkDefense()
             
             # stats
             self.stats = save_data.get("stats", self.stats)
