@@ -247,29 +247,7 @@ class gameEngine: # primary class that will import the objects for the game
         else:
             print(f"Slot {slot} does not exist in equipped items.")
 
-    def checkDefense(self):
-        """
-        Update defense stat based on equipped armour
-        """
-        armour = self.equipped.get("Armour", {}) or {}
-        defense = armour.get("Defense", self.stats.get("Defense", 5))
-        if defense != self.stats.get("Defense"):
-            self.stats["Defense"] = defense
 
-    def handlerInventoryEquip(self, args):
-        """
-        Equip an item from the backpack into a slot.
-        Usage: equip <item_name> <slot>
-        Slots: MainHand, OffHand, Armour
-        """
-        if len(args) < 2:
-            print("Usage: equip <item_name> <slot>")
-            print("Slots: MainHand, OffHand, Armour")
-            return
-
-        item_name = args[0]
-        slot = args[1]
-        self.equipItem(item_name, slot)
 
     def handlerHelp(self, args):
         # formatting and menu layout
