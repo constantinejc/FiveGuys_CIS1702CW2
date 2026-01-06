@@ -310,6 +310,73 @@ class gameEngine: # primary class that will import the objects for the game
         except OSError as e:
             print(f"Unable to save game: {e}")
 
+    def handlerLoad(self, args):
+        # pick filename
+        if args:
+            base = args[0]
+            filename = base if base.endswith(".json") else base + ".json"
+        else:
+            filename = "save.json"
+        
+        # load save
+        try:
+            with open(filename, "r") as file:
+                save_data = json.load(file)
+                
+            # get rooms
+            room_id = save_data.get("current_room", "start")
+            # reload map
+            with open("gameMap.json", "r") as f:
+                worldData = json.load(f)
+            
+            rooms = {}
+            for roomID in worldData.get("rooms", {}):
+                data = worldData["rooms"][roomID]
+                newRoom = BaseRoom(
+                    data.get("name", roomID),
+                    data.get("description", ""),
+                    room_id=roomID,
+                    isWinRoom=data.get("win", False),
+                    isDeathRoom=data.get("death", False),
+                )
+                rooms[roomID] = newRoom
+            
+            # room exits
+            for roomID in worldData.get("rooms", {}):
+                data = worldData["rooms"][roomID]
+                for direction in data.get("exits", {}):
+                    targetID = data["exits"][direction]
+                    target_room = rooms.get(targetID)
+                    if target_room:
+                        rooms[roomID].addExit(direction.lower(), target_room)
+            
+            # set room
+            if room_id in rooms:
+                self.currentRoom = rooms[room_id]
+            else:
+                print(f"Warning: Saved room '{room_id}' not found. Starting at beginning.")
+                self.currentRoom = rooms.get(next(iter(rooms)))
+            
+            # restore inventory
+            inv_data = save_data.get("inventory", {})
+            self.inventory["Backpack"] = inv_data.get("Backpack", [])
+            self.inventory["Equipped"] = inv_data.get("Equipped", {"MainHand": {}, "OffHand": {}, "Armour": {}})
+            
+            # stats
+            self.stats = save_data.get("stats", self.stats)
+            
+            print(f"Game loaded from {filename}")
+            # show room
+            self.handlerObservation([])
+        
+        #erorr handles for different cases
+        except FileNotFoundError:
+            print(f"Save file '{filename}' not found.")
+        except json.JSONDecodeError:
+            print(f"Error reading save file '{filename}'. File may be corrupted.")
+        except Exception as e:
+            print(f"Error loading game: {e}")
+    
     def handlerQuit(self, args):
         self.handlerSave(args)
         print("Saving game...") #printed message to confirm that the game is saving
