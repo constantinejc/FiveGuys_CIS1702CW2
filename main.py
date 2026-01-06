@@ -69,6 +69,9 @@ class gameEngine: # primary class that will import the objects for the game
                 isWinRoom=data.get("win", False),
                 isDeathRoom=data.get("death", False),
             )
+            # load items defined for the room (if any)
+            for item in data.get("items", []):
+                newRoom.items.append(item)
             rooms[roomID] = newRoom
             #This block of code just assigns the player to the predefined starting room as specified in the json by the user.
             #It also handles the error if the user has not assigned a starting room for the player character.
@@ -178,7 +181,8 @@ class gameEngine: # primary class that will import the objects for the game
         #Checking if the item is within the room
         target_item = None
         for item in self.currentRoom.items:
-            if item.name.lower() == item_name:
+            name = getattr(item, "name", str(item)).lower()
+            if name == item_name:
                 target_item = item
                 break
 

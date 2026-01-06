@@ -91,6 +91,7 @@ Example structure:
   - `description`: The description of the room which the player can view by inspecting in its direction (e.g. `This is a kitchen. The oven has been left on and there is a gas leak. This is a dangerous place to be. perchance`)
   - `isStart`: Whether this room is the starting room for the player character. Only one room can have this value be set to `true`, the rest must be `false`.
   - `exits`: This defines whether the room has any exits, which cardinal directions they are in and which room is attached to that direction. (e.g. "south": "mainHall", "north": "bedroom1").
+  - `items`: Optional list of items in the room (e.g. `["loaf of bread", "rusty key"]`).
   - `death`: This defines whether this is a kill-room. The player dies upon entering and the game enters a failure state. (e.g. `true` as in our example, the kitchen has a gas leak)
   - `win`: This defines whether this is a win condition room. The game enters the win state upon the player entering it. (e.g. `false`)
 
@@ -107,6 +108,7 @@ Example structure:
             "exits": {
                 "north": "library1"
             },
+            "items": ["loaf of bread", "kitchen knife"],
             "death": false,
             "win": false
         },
@@ -119,6 +121,7 @@ Example structure:
                 "south": "kitchen1",
                 "east": "bedroom1"
             },
+            "items": ["ancient tome", "rusty key"],
             "death": false,
             "win": false
 
