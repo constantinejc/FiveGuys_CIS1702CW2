@@ -42,7 +42,9 @@ class gameEngine: # primary class that will import the objects for the game
             data = json.load(f)
         for cmd in data.values():
             handler = getattr(self, cmd["handler"])
-            self.parser.addActions(cmd["verbs"], handler)
+            desc = cmd.get("description", "")
+            usage = cmd.get("usage", "")
+            self.parser.addActions(cmd["verbs"], handler, desc, usage)
 
 #This funciton will take a seperate file which holds all of the data about the map that the user has made, and turn it into a working map.
 
@@ -260,12 +262,19 @@ class gameEngine: # primary class that will import the objects for the game
         if not self.parser.actions:
             print("No actions loaded. Check actions.json.")
         else:
-            for cmd in self.parser.actions:
-                verbs = ", ".join(cmd.actions)
-                handlerName = cmd.handler.__name__.replace("handler", "").replace("Inventory", "") # removes either handler or Inventory from handle names
-                print(f"  [{handlerName}]")
-                print(f"    {verbs}")
-                print()
+            try:
+                for cmd in self.parser.actions:
+                    verbs = ", ".join(cmd.actions)
+                    handlerName = cmd.handler.__name__.replace("handler", "").replace("Inventory", "") # removes either handler or Inventory from handle names
+                    print(f"  [{handlerName}]")
+                    if getattr(cmd, "description", None):
+                        print(f"    {cmd.description}")
+                    print(f"    Verbs: {verbs}")
+                    if getattr(cmd, "usage", None):
+                        print(f"    Usage: {cmd.usage}")
+                    print()
+            except Exception as e:
+                print("Error reading the actions set. Check that the actions.json file is valid and contains all of the required fields.\n. Required fields are: verbs, handler, description, usage.")
         print("-" * 50)
         # can add tips or any other info here
         print("\nType any one of these actions to interact with this game.")
@@ -383,16 +392,18 @@ class gameEngine: # primary class that will import the objects for the game
         self.running = False #stops the game from running
 
 class playerCmd: # class that will handle player input
-    def __init__(self, actions, handler):
+    def __init__(self, actions, handler, description="", usage=""):
         self.actions = actions # pulls a list of valid synonyms for all actions
         self.handler = handler # a handler is the executable instruction (actual result the player expects by writing an action)
+        self.description = description
+        self.usage = usage
 class playerCmdParser: # the parser will read through the list of actions and match them to a handler, accounting for synonyms
     def __init__(self, engine):
         self.engine = engine # still gotta figure out why i would do this but some guy online doing the same thing did this, if i dont figure it out im deleting this :'D
         self.actions = [] # empty list of valid actions, to be populated by the following functions
 
-    def addActions(self, actions, handler):
-        self.actions.append(playerCmd(actions, handler))
+    def addActions(self, actions, handler, description="", usage=""):
+        self.actions.append(playerCmd(actions, handler, description, usage))
 
     def parse(self, line):
         words = line.lower().split() # grabs player input string (line), converts it to lowercase & splits for every space
