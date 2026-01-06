@@ -49,9 +49,12 @@ The engine looks for the following files in the same folder as `main.py`:
   - `gameMap.json`
   - [jack's character object json(s?) for main char, enemies, npcs, etc]
 
+  A sample `actions.json` and `gameMap.json` are included within this repository for reference, and can be used as a base to create your own game. 
+
 # JSON FILE STRUCTURE
 ## ACTIONS.JSON
-`actions.json` should have a table which maps verbs to a handler. The handlers are hardcoded and the full list is:
+`actions.json` should have a table which maps verbs to a handler, as well as a description and usage instructions. A sample actions.json is included for reference.
+The handlers are hardcoded and the full list is:
 - `handlerMovement` which when called will take the direction argument (e.g. `north`) and update the player character's location;
 - `handlerObservation` which when called will take the direction argument (e.g. `north`) OR item name argument (e.g. `lantern`) and print its description;
 - `handlerInteraction` which when called will take the item name argument (e.g. `lantern`) and add it to the player's inventory;
@@ -68,11 +71,15 @@ Example structure:
 {
   "movement": {
     "verbs": ["go", "move", "walk", "run", "mv", "m"],
-    "handler": "handlerMovement"
+    "handler": "handlerMovement",
+    "description": "Move to another connected room",
+    "usage": "go <direction>"
   },
   "observation": {
     "verbs": ["look", "examine", "inspect", "view", "v"],
-    "handler": "handlerObservation"
+    "handler": "handlerObservation",
+    "description": "Look around and see room details",
+    "usage": "look"
   },
 ...
 ```
