@@ -119,7 +119,7 @@ Example structure:
 ...
 ```
 
-### Characters
+## CHARACTER .JSONS
 - Base Character
 ```
 {
@@ -172,6 +172,7 @@ Example structure:
 }
 ```
 The code does provide a default option for the creation of a base character, with int value filled in and the backpack and equiptment being set to empty.
+
 # SETUP
 
 Clone the repository to an empty folder, put prerequisite .json files next to `main.py` then run `main.py` in environment of choice with Python 3.8 or higher installed.
