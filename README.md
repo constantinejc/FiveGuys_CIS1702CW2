@@ -49,12 +49,16 @@ The engine looks for the following files in the same folder as `main.py`:
   - `gameMap.json`
   - [jack's character object json(s?) for main char, enemies, npcs, etc]
 
+  A sample `actions.json` and `gameMap.json` are included within this repository for reference, and can be used as a base to create your own game. 
+
 # JSON FILE STRUCTURE
 ## ACTIONS.JSON
-`actions.json` should have a table which maps verbs to a handler. The handlers are hardcoded and the full list is:
+`actions.json` should have a table which maps verbs to a handler, as well as a description and usage instructions. A sample actions.json is included for reference.
+The handlers are hardcoded and the full list is:
 - `handlerMovement` which when called will take the direction argument (e.g. `north`) and update the player character's location;
 - `handlerObservation` which when called will take the direction argument (e.g. `north`) OR item name argument (e.g. `lantern`) and print its description;
 - `handlerInteraction` which when called will take the item name argument (e.g. `lantern`) and add it to the player's inventory;
+- `handlerInteraction` which when called will take the item name argument and either add it to the player's inventory (grab) or drop it from the player's inventory into the room (drop);
 - `handlerInventoryView` which when called does not take arguments and prints a list of items in the player's posession
 - `handlerInventoryEquip` which when called will take the item name argument (e.g. `lantern`), check whether it is in the player's posession and then equip it in the player's hand
 - `handlerHelp` which when called does not take arguments and prints a list of all currently available actions, filtering out unavailable ones
@@ -68,11 +72,21 @@ Example structure:
 {
   "movement": {
     "verbs": ["go", "move", "walk", "run", "mv", "m"],
-    "handler": "handlerMovement"
+    "handler": "handlerMovement",
+    "description": "Move to another connected room",
+    "usage": "go <direction>"
   },
   "observation": {
     "verbs": ["look", "examine", "inspect", "view", "v"],
-    "handler": "handlerObservation"
+    "handler": "handlerObservation",
+    "description": "Look around and see room details",
+    "usage": "look"
+  },
+  "interaction": {
+    "verbs": ["grab", "pickup", "obtain", "g", "drop", "d"],
+    "handler": "handlerInteraction",
+    "description": "Pick up an item from the room or drop an item from your inventory",
+    "usage": "grab <item> | drop <item>"
   },
 ...
 ```
@@ -84,6 +98,7 @@ Example structure:
   - `description`: The description of the room which the player can view by inspecting in its direction (e.g. `This is a kitchen. The oven has been left on and there is a gas leak. This is a dangerous place to be. perchance`)
   - `isStart`: Whether this room is the starting room for the player character. Only one room can have this value be set to `true`, the rest must be `false`.
   - `exits`: This defines whether the room has any exits, which cardinal directions they are in and which room is attached to that direction. (e.g. "south": "mainHall", "north": "bedroom1").
+  - `items`: Optional list of items in the room (e.g. `["loaf of bread", "rusty key"]`).
   - `death`: This defines whether this is a kill-room. The player dies upon entering and the game enters a failure state. (e.g. `true` as in our example, the kitchen has a gas leak)
   - `win`: This defines whether this is a win condition room. The game enters the win state upon the player entering it. (e.g. `false`)
 
@@ -100,6 +115,7 @@ Example structure:
             "exits": {
                 "north": "library1"
             },
+            "items": ["loaf of bread", "kitchen knife"],
             "death": false,
             "win": false
         },
@@ -112,6 +128,7 @@ Example structure:
                 "south": "kitchen1",
                 "east": "bedroom1"
             },
+            "items": ["ancient tome", "rusty key"],
             "death": false,
             "win": false
 
@@ -180,6 +197,16 @@ Clone the repository to an empty folder, put prerequisite .json files next to `m
 # USAGE 
 
 Once `main.py` is run, the game should greet the player. The player can act upon the game by providing either a verb on its own, or a verb-noun combination. For a list of all available actions, the player may write `help`. Each command has guidance attached to it, so if the player is unsure about a command's usage they may write `help [command]` to view its guidance.
+
+Quick examples:
+- Move: `go north`
+- Look around: `look`
+- Pick up: `grab loaf of bread`
+- Drop: `drop loaf of bread`
+- Inventory: `inventory`
+- Save/Load: `save mygame`, `load mygame`
+
+Save files keep room item states. Items picked up or dropped are stored per-room in the save file (field `rooms_state`) and are restored when loaded.
 
 # LICENSE
 

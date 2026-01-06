@@ -11,6 +11,7 @@ class gameEngine: # primary class that will import the objects for the game
         self.title = title
         self.parser = playerCmdParser(self)
         self.currentRoom = None
+        self.rooms = {}  # Track  loaded rooms for save/load
         self.loadActions("actions.json")
         self.loadMap("gameMap.json") #I have added this function so that the user can enter the json file which has the data for the map 
         self.inventory = {
@@ -42,7 +43,9 @@ class gameEngine: # primary class that will import the objects for the game
             data = json.load(f)
         for cmd in data.values():
             handler = getattr(self, cmd["handler"])
-            self.parser.addActions(cmd["verbs"], handler)
+            desc = cmd.get("description", "")
+            usage = cmd.get("usage", "")
+            self.parser.addActions(cmd["verbs"], handler, desc, usage)
 
 #This funciton will take a seperate file which holds all of the data about the map that the user has made, and turn it into a working map.
 
@@ -67,12 +70,18 @@ class gameEngine: # primary class that will import the objects for the game
                 isWinRoom=data.get("win", False),
                 isDeathRoom=data.get("death", False),
             )
+            # load items defined for the room (if any)
+            for item in data.get("items", []):
+                newRoom.items.append(item)
             rooms[roomID] = newRoom
             #This block of code just assigns the player to the predefined starting room as specified in the json by the user.
             #It also handles the error if the user has not assigned a starting room for the player character.
             if data.get("isStart") and not start_set:
                 self.currentRoom = newRoom
                 start_set = True
+        
+        # store rooms (used for save/load)
+        self.rooms = rooms
 
         if not rooms:
             print("Warning, Map file has no rooms.")
@@ -176,16 +185,17 @@ class gameEngine: # primary class that will import the objects for the game
         #Checking if the item is within the room
         target_item = None
         for item in self.currentRoom.items:
-            if item.name.lower() == item_name:
+            name = getattr(item, "name", str(item)).lower()
+            if name == item_name:
                 target_item = item
                 break
 
-        #If the item is within the room then it is removed and added to the inventory
+        #If the item is within the room then it is removed and added to the inventory (store as name string)
         if target_item:
             self.currentRoom.items.remove(target_item)
-            # Match this to your equipItem logic
-            self.inventory["Backpack"].append(target_item) 
-            print(f"{target_item.name} has been added to your inventory..")
+            item_to_add = getattr(target_item, "name", str(target_item))
+            self.inventory["Backpack"].append(item_to_add)
+            print(f"{item_to_add} has been added to your inventory.")
             return
 
         #Searching for item in inventory and if it is within the inventory it is dropped
@@ -223,12 +233,11 @@ class gameEngine: # primary class that will import the objects for the game
                 print(f"Item {itemName} not in backpack.")
                 return
             else:
-                item = self.inventory["Backpack"][self.inventory["Backpack"].index(itemName)]
                 self.inventory["Backpack"].remove(itemName)
             if self.equipped[slot]:
                 self.unequipItem(slot)
-            self.equipped[slot] = item
-            self.checkDefense()
+            # store equipped item as its name string
+            self.equipped[slot] = itemName
         else:
             print(f"Slot {slot} does not exist in equipped items.")
         
@@ -243,29 +252,72 @@ class gameEngine: # primary class that will import the objects for the game
             item = self.equipped[slot]
             self.inventory["Backpack"].append(item)
             self.equipped[slot] = {}
-            self.checkDefense()
         else:
             print(f"Slot {slot} does not exist in equipped items.")
-
-
 
     def handlerHelp(self, args):
         # formatting and menu layout
         print("\n" + "="*50)
         print(f"  {self.title} - Help")
-        print("="*50 + "\n")
-        print("Available Actions:")
         print("-" * 50)
         # pulls actions and handler names from json and lists
         if not self.parser.actions:
             print("No actions loaded. Check actions.json.")
-        else:
+            return
+
+        # if a specific command is requested: help <command>
+        if args:
+            query = " ".join(args).lower()
+            matches = []
+            try:
+                for cmd in self.parser.actions:
+                    verbs_lower = [v.lower() for v in cmd.actions]
+                    handler_raw = cmd.handler.__name__
+                    handler_name = handler_raw.replace("handler", "").replace("Inventory", "")
+                    if (
+                        query in verbs_lower
+                        or query == handler_raw.lower()
+                        or query == handler_name.lower()
+                    ):
+                        matches.append((cmd, handler_name))
+            except Exception:
+                print("Error reading the actions set. Check that the actions.json file is valid and contains all of the required fields.\n. Required fields are: verbs, handler, description, usage.")
+                return
+
+            if not matches:
+                print(f"No action matches '{query}'. Type 'help' to see all actions.")
+                return
+
+            print("Action Details:")
+            print("-" * 50)
+            for cmd, handler_name in matches:
+                verbs = ", ".join(cmd.actions)
+                print(f"  [{handler_name}]")
+                if getattr(cmd, "description", None):
+                    print(f"    {cmd.description}")
+                print(f"    Verbs: {verbs}")
+                if getattr(cmd, "usage", None):
+                    print(f"    Usage: {cmd.usage}")
+                print()
+            print("-" * 50)
+            return
+
+        # otherwise, show the full list
+        print("Available Actions:")
+        print("-" * 50)
+        try:
             for cmd in self.parser.actions:
                 verbs = ", ".join(cmd.actions)
-                handlerName = cmd.handler.__name__.replace("handler", "").replace("Inventory", "") # removes either handler or Inventory from handle names
+                handlerName = cmd.handler.__name__.replace("handler", "").replace("Inventory", "")
                 print(f"  [{handlerName}]")
-                print(f"    {verbs}")
+                if getattr(cmd, "description", None):
+                    print(f"    {cmd.description}")
+                print(f"    Verbs: {verbs}")
+                if getattr(cmd, "usage", None):
+                    print(f"    Usage: {cmd.usage}")
                 print()
+        except Exception:
+            print("Error reading the actions set. Check that the actions.json file is valid and contains all of the required fields.\n. Required fields are: verbs, handler, description, usage.")
         print("-" * 50)
         # can add tips or any other info here
         print("\nType any one of these actions to interact with this game.")
@@ -288,10 +340,15 @@ class gameEngine: # primary class that will import the objects for the game
         if self.currentRoom:
             room_ref = getattr(self.currentRoom, "id", None) or getattr(self.currentRoom, "name", None)
         
-        # Save inventory (now a dict with Backpack and Equipped)
+        # save inventory (now a dict with Backpack and Equipped)
         backpack_items = self.inventory.get("Backpack", [])
         equipped_items_raw = self.inventory.get("Equipped", {})
         equipped_items = {slot: getattr(item, "name", str(item)) for slot, item in equipped_items_raw.items()}
+        
+        # get room items for save file
+        rooms_state = {}
+        for room_id, room in self.rooms.items():
+            rooms_state[room_id] = [getattr(item, "name", str(item)) for item in room.items]
         
         save_data = {
             "current_room": room_ref or "start",
@@ -299,7 +356,8 @@ class gameEngine: # primary class that will import the objects for the game
                 "Backpack": [getattr(item, "name", str(item)) for item in backpack_items],
                 "Equipped": equipped_items
             },
-            "stats": self.stats
+            "stats": self.stats,
+            "rooms_state": rooms_state
         }
 
         #writing to a file with try except error handling
@@ -339,7 +397,13 @@ class gameEngine: # primary class that will import the objects for the game
                     isWinRoom=data.get("win", False),
                     isDeathRoom=data.get("death", False),
                 )
+                # default items from gameMap.json
+                for item in data.get("items", []):
+                    newRoom.items.append(item)
                 rooms[roomID] = newRoom
+            
+            # store rooms (used for save/load)
+            self.rooms = rooms
             
             # room exits
             for roomID in worldData.get("rooms", {}):
@@ -349,6 +413,12 @@ class gameEngine: # primary class that will import the objects for the game
                     target_room = rooms.get(targetID)
                     if target_room:
                         rooms[roomID].addExit(direction.lower(), target_room)
+            
+            # get room items from save if present
+            rooms_state = save_data.get("rooms_state", {})
+            for saved_room_id, saved_items in rooms_state.items():
+                if saved_room_id in rooms:
+                    rooms[saved_room_id].items = saved_items[:]
             
             # set room
             if room_id in rooms:
@@ -361,6 +431,7 @@ class gameEngine: # primary class that will import the objects for the game
             inv_data = save_data.get("inventory", {})
             self.inventory["Backpack"] = inv_data.get("Backpack", [])
             self.inventory["Equipped"] = inv_data.get("Equipped", {"MainHand": {}, "OffHand": {}, "Armour": {}})
+            self.equipped = self.inventory["Equipped"]
             
             # stats
             self.stats = save_data.get("stats", self.stats)
@@ -383,16 +454,18 @@ class gameEngine: # primary class that will import the objects for the game
         self.running = False #stops the game from running
 
 class playerCmd: # class that will handle player input
-    def __init__(self, actions, handler):
+    def __init__(self, actions, handler, description="", usage=""):
         self.actions = actions # pulls a list of valid synonyms for all actions
         self.handler = handler # a handler is the executable instruction (actual result the player expects by writing an action)
+        self.description = description
+        self.usage = usage
 class playerCmdParser: # the parser will read through the list of actions and match them to a handler, accounting for synonyms
     def __init__(self, engine):
         self.engine = engine # still gotta figure out why i would do this but some guy online doing the same thing did this, if i dont figure it out im deleting this :'D
         self.actions = [] # empty list of valid actions, to be populated by the following functions
 
-    def addActions(self, actions, handler):
-        self.actions.append(playerCmd(actions, handler))
+    def addActions(self, actions, handler, description="", usage=""):
+        self.actions.append(playerCmd(actions, handler, description, usage))
 
     def parse(self, line):
         words = line.lower().split() # grabs player input string (line), converts it to lowercase & splits for every space
@@ -404,7 +477,7 @@ class playerCmdParser: # the parser will read through the list of actions and ma
             if userVerb in cmd.actions:
                 return lambda: cmd.handler(words[1:]) # run the function with the matching handler
         
-        # If no matching action found, show an error message
+        # if no matching action found, show an error message
         return lambda: print(f"'{userVerb}' is not a valid action. Type 'help' to see valid actions.")
 
 if __name__ == "__main__":

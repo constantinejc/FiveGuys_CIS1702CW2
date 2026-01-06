@@ -1,42 +1,62 @@
 {
   "movement": {
     "verbs": ["go", "move", "walk", "run", "mv", "m"],
-    "handler": "handlerMovement"
+    "handler": "handlerMovement",
+    "description": "Move to another connected room",
+    "usage": "go <direction>"
   },
   "observation": {
     "verbs": ["look", "examine", "inspect", "view", "v"],
-    "handler": "handlerObservation"
+    "handler": "handlerObservation",
+    "description": "Look around and see room details",
+    "usage": "look"
   },
   "interaction": {
-    "verbs": ["grab", "pickup", "obtain", "g"],
-    "handler": "handlerInteraction"
+    "verbs": ["grab", "pickup", "obtain", "g", "drop", "d"],
+    "handler": "handlerInteraction",
+    "description": "Pick up an item from the room or drop an item from your inventory",
+    "usage": "grab <item> | drop <item>"
   },
   "inventoryview": {
     "verbs": ["inventory", "backpack", "whatsonme", "i"],
-    "handler": "handlerInventoryView"
+    "handler": "handlerInventoryView",
+    "description": "Show items in your backpack",
+    "usage": "inventory"
   },
   "inventoryequip": {
     "verbs": ["equip", "select", "pullout", "e"],
-    "handler": "equipItem"
+    "handler": "equipItem",
+    "description": "Equip an item to a slot. Available slots are: MainHand, OffHand, Armour.",
+    "usage": "equip <item> <slot>"
   },  
   "inventoryunequip": {
     "verbs": ["unequip", "deselect", "putaway", "u"],
-    "handler": "unequipItem"
+    "handler": "unequipItem",
+    "description": "Unequip an item from a slot. Available slots are: MainHand, OffHand, Armour.",
+    "usage": "unequip <slot>"
   },
   "help": {
     "verbs": ["help", "h", "?"],
-    "handler": "handlerHelp"
+    "handler": "handlerHelp",
+    "description": "Show available actions",
+    "usage": "help"
   },
   "save": {
     "verbs": ["save", "savegame", "s"],
-    "handler": "handlerSave"
+    "handler": "handlerSave",
+    "description": "Save your progress",
+    "usage": "save [filename]"
   },
   "load": {
     "verbs": ["load", "loadgame", "l"],
-    "handler": "handlerLoad"
+    "handler": "handlerLoad",
+    "description": "Load a saved game",
+    "usage": "load [filename]"
   },
   "quit": {
     "verbs": ["quit", "exit", "q"],
-    "handler": "handlerQuit"
+    "handler": "handlerQuit",
+    "description": "Save and exit",
+    "usage": "quit"
   }
 }
