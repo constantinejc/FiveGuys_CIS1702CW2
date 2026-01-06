@@ -17,8 +17,12 @@
   },
   "inventoryequip": {
     "verbs": ["equip", "select", "pullout", "e"],
-    "handler": "handlerInventoryEquip"
+    "handler": "equipItem"
   },  
+  "inventoryunequip": {
+    "verbs": ["unequip", "deselect", "putaway", "u"],
+    "handler": "unequipItem"
+  },
   "help": {
     "verbs": ["help", "h", "?"],
     "handler": "handlerHelp"

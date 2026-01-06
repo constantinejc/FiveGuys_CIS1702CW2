@@ -13,7 +13,20 @@ class gameEngine: # primary class that will import the objects for the game
         self.currentRoom = None
         self.loadActions("actions.json")
         self.loadMap("gameMap.json") #I have added this function so that the user can enter the json file which has the data for the map 
-        self.inventory = []  # check inventory exists for saving
+        self.inventory = {
+            "Equipped": {
+                "MainHand": {},
+                "OffHand": {},
+                "Armour": {}
+            },
+            "Backpack": []
+        }
+        self.equipped = self.inventory["Equipped"]
+        self.stats = {
+            "StrengthModifier": 5,
+            "AttackModifier": 5,
+            "Defense": 5
+        }
         self.running = True
         
         # welcome and call observation.
@@ -110,6 +123,8 @@ class gameEngine: # primary class that will import the objects for the game
             #The following lines arejust feedback to the player, depending on whether the direction they have entered
             #is valid or not.
             print(f"You moved to the {self.currentRoom.name}")
+            # Auto-look after moving
+            self.handlerObservation([])
             if getattr(self.currentRoom, "isWinRoom", False):
                 print("You win!")
                 self.running = False
@@ -147,6 +162,10 @@ class gameEngine: # primary class that will import the objects for the game
             print("\nNo items visible.")
 
     def handlerInteraction(self, args):
+        if not self.currentRoom:
+            print("No current room set.")
+            return
+            
         if not args:
             print("What do you want to do?")
             return
@@ -200,12 +219,12 @@ class gameEngine: # primary class that will import the objects for the game
         :param slot: The slot to equip the item to
         """
         if slot in self.equipped:
-            if itemName not in self.inventory["BackPack"]:
+            if itemName not in self.inventory["Backpack"]:
                 print(f"Item {itemName} not in backpack.")
                 return
             else:
-                item = self.inventory["BackPack"][self.inventory["BackPack"].index(itemName)]
-                self.inventory["BackPack"].remove(itemName)
+                item = self.inventory["Backpack"][self.inventory["Backpack"].index(itemName)]
+                self.inventory["Backpack"].remove(itemName)
             if self.equipped[slot]:
                 self.unequipItem(slot)
             self.equipped[slot] = item
@@ -222,12 +241,14 @@ class gameEngine: # primary class that will import the objects for the game
         """
         if slot in self.equipped:
             item = self.equipped[slot]
-            self.inventory["BackPack"].append(item)
+            self.inventory["Backpack"].append(item)
             self.equipped[slot] = {}
             self.checkDefense()
         else:
             print(f"Slot {slot} does not exist in equipped items.")
-    
+
+
+
     def handlerHelp(self, args):
         # formatting and menu layout
         print("\n" + "="*50)
@@ -241,7 +262,7 @@ class gameEngine: # primary class that will import the objects for the game
         else:
             for cmd in self.parser.actions:
                 verbs = ", ".join(cmd.actions)
-                handlerName = cmd.handler.__name__.replace("handler", "") # removes "handler" from handle names
+                handlerName = cmd.handler.__name__.replace("handler", "").replace("Inventory", "") # removes either handler or Inventory from handle names
                 print(f"  [{handlerName}]")
                 print(f"    {verbs}")
                 print()
@@ -266,10 +287,19 @@ class gameEngine: # primary class that will import the objects for the game
         room_ref = None
         if self.currentRoom:
             room_ref = getattr(self.currentRoom, "id", None) or getattr(self.currentRoom, "name", None)
-        inv = getattr(self, "inventory", []) or []
+        
+        # Save inventory (now a dict with Backpack and Equipped)
+        backpack_items = self.inventory.get("Backpack", [])
+        equipped_items_raw = self.inventory.get("Equipped", {})
+        equipped_items = {slot: getattr(item, "name", str(item)) for slot, item in equipped_items_raw.items()}
+        
         save_data = {
             "current_room": room_ref or "start",
-            "inventory": [getattr(item, "name", str(item)) for item in inv]
+            "inventory": {
+                "Backpack": [getattr(item, "name", str(item)) for item in backpack_items],
+                "Equipped": equipped_items
+            },
+            "stats": self.stats
         }
 
         #writing to a file
